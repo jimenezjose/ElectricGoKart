@@ -1,5 +1,5 @@
 #define DRIVE 1
-#define REVERSE 0
+#define REVERSE 0 
 
 const int pedal = A0;
 const int motor = 9;
