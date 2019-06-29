@@ -1,3 +1,9 @@
+/**
+ * Author:      Jose Jimenez
+ * File Name:   SpeedometerGUI.java   
+ * Description: Vehicle Speedometer Graphical User Interface.
+ */
+
 import java.awt.*;
 import java.awt.geom.*;
 import javax.swing.*;
@@ -6,8 +12,11 @@ import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 import javax.swing.Timer;
 
-
+/**
+ * TODO
+ */
 public class SpeedometerGUI implements ActionListener {
+
 
   private static final Color LIGHT_BLACK     = new Color( 32, 32, 32 );
   private static final Color NEON_GREEN      = new Color( 0, 128, 0 );
@@ -15,48 +24,27 @@ public class SpeedometerGUI implements ActionListener {
   private static final Color METALLIC_BLACK  = new Color( 50, 50, 50 );
   private static final Color NEON_RED        = new Color( 255, 0, 0 );
   private static final Color DARK_NEON_RED   = new Color( 200, 0, 0 );
-
   private static final String TRANSMISSION_LABEL = "P  R  D";
   private static final String MPH_LABEL          = "MPH";
+  /* Transmission types */
+  private enum Transmission { PARK, REVERSE, DRIVE }
 
   public static final int MAX_SPEED = 120;
   public static final int MIN_SPEED = 0;
+  public static final int MIN_ANGLE = -150;
+  public static final int MAX_ANGLE = 150;
+  private static final int DELAY    = 50;
 
-  public static final int MIN_ANGLE  = -150;
-  public static final int MAX_ANGLE  = 150;
-
-  private static final int DELAY = 50;
-
-  private int prevTheta = MIN_ANGLE;
-
-  public RoundRectangle2D needle;
-  public Point center;
-
-  /* speedometer dimensions */
-  private int outer_diameter;
-  private int outer_radius;
-  private int diameter;
-  private int radius;   
-  private int rim_diameter; 
-  private int rim_radius;
-  private int inner_diameter; 
-  private int inner_radius; 
-  private int needle_offset;
-  private int needle_width;
-
-  /* speedometer label dimensions */
-  private int tensWidth; 
-  private int tensOffset;
-  private double arcAngle;
-
-  /* transmission specs */
-  private Font transmissionFont;
-  private int transmission_width;
-  private int MPH_offset;
-
-  //TODO
+  /* used to render speed of speedometer */
+  private int currentTheta = MIN_ANGLE;
+  private Transmission transmission_state = Transmission.PARK;
+  
+  /* rendering panel with enabled double buffering */
   private JPanel renderPanel;
   private Timer timer;
+
+  boolean increasing = true;
+  int speed = MIN_SPEED;
 
   /**
    *  Sets up the window behavior and graphics of the Speedometer GUI.
@@ -65,7 +53,9 @@ public class SpeedometerGUI implements ActionListener {
     begin();
   }
 
-  //TODO
+  /**
+   * TODO
+   */
   private void begin() {
     JFrame main_frame = new JFrame( "Speedometer Graphics" );
     main_frame.setSize( 400, 400 );
@@ -87,24 +77,70 @@ public class SpeedometerGUI implements ActionListener {
     timer.start();
   }
 
-  //TODO
+  /**
+   * TODO
+   */
   public void actionPerformed( ActionEvent evt ) {
     if( evt.getSource() == timer ) {
       renderPanel.repaint();
-      prevTheta++;
+
+      setSpeed( speed );
+
+      if( speed == getMinSpeed() ) setInPark();
+      else if( speed == getMaxSpeed() / 2 ) setInReverse();
+      else if( speed == getMaxSpeed() ) setInDrive();
+
+      if( speed ==  getMaxSpeed() ) increasing = false;   
+      else if( speed == getMinSpeed() ) increasing = true;
+
+      speed += ( increasing ) ? 1 : -1; 
+      speed = speed % ( getMaxSpeed() + 1 );
+      //currentTheta++;
     }
   }
 
-
-  //TODO
+  /**
+   * TODO
+   */
   private class RenderPanel extends JPanel {
+        /* speedometer needle and center point of GUI */
+    private RoundRectangle2D needle;
+    private Point center;
 
+    /* speedometer dimensions */
+    private int outer_diameter;
+    private int outer_radius;
+    private int diameter;
+    private int radius;   
+    private int rim_diameter; 
+    private int rim_radius;
+    private int inner_diameter; 
+    private int inner_radius; 
+    private int needle_offset;
+    private int needle_width;
+
+    /* speedometer label dimensions */
+    private int tensWidth; 
+    private int tensOffset;
+    private double arcAngle;
+
+    /* transmission specs */
+    private Font transmissionFont;
+    private int transmission_width;
+    private int MPH_offset;
+
+    /**
+     * TODO
+     */
     @Override
     protected void paintComponent( Graphics g ) {
       super.paintComponent( g );
       render( g );
     }
 
+    /**
+     * TODO
+     */
     private void render( Graphics g ) {
       drawSpeedometer( g );
     }
@@ -179,8 +215,8 @@ public class SpeedometerGUI implements ActionListener {
       }
 
       /* speedometer needles */
-      needle = new RoundRectangle2D.Double( center.x, center.y - rim_radius + needle_offset, needle_width, rim_radius - needle_offset /*- inner_radius*/, 6, 6 );
-      rotateNeedle( g, prevTheta - MIN_ANGLE );
+      needle = new RoundRectangle2D.Double( center.x, center.y - rim_radius + needle_offset, needle_width, rim_radius - needle_offset, 6, 6 );
+      rotateNeedle( g, currentTheta - MIN_ANGLE );
 
       /* speedometer needle origin */
       g.setColor( METALLIC_BLACK );
@@ -198,9 +234,12 @@ public class SpeedometerGUI implements ActionListener {
       g.setFont( transmissionFont );
       transmission_width = g.getFontMetrics().stringWidth( TRANSMISSION_LABEL );
       /* Assume car is in park */
-      setInPark( g ); // TODO make sure this is not left. breaks when window resize and transmission set to park compliment
+      setTransmission( g, transmission_state );
     }
 
+    /**
+     * TODO
+     */
     private void drawSpeedDigit( Graphics g, int speed, double theta, Color color ) {
       double needle_radius = rim_radius - needle_offset; 
       double x = center.x + needle_radius * Math.cos( Math.toRadians(-((int)theta) + 90) );
@@ -239,9 +278,6 @@ public class SpeedometerGUI implements ActionListener {
 	y += g.getFontMetrics().getHeight() / 4;
       }
 
-      //double dx = 
-      //double dy
-      //Graphics g = getGraphics();
       g.drawString( Integer.toString(speed), (int)(x), (int)(y) );
     }
 
@@ -280,29 +316,6 @@ public class SpeedometerGUI implements ActionListener {
       g2d.setTransform( old );
     }
 
-
-    /**
-     * TODO 
-     */
-    private void setTransmission( Graphics g, char transmission ) {
-      String label = TRANSMISSION_LABEL;
-
-      if( transmission != 'P' && transmission != 'R' && transmission != 'D' ) {
-        // invlid input 
-        return;
-      }
-    
-      g.setFont( transmissionFont );
-      int x_startPoint = (int)(center.x - transmission_width / 2.0); 
-      int x_offset = g.getFontMetrics().stringWidth( label.substring(0, label.indexOf(transmission)) );
-      int y_offset = center.y + 3 * MPH_offset;
-
-      g.setColor( Color.WHITE );
-      g.drawString( label, x_startPoint, y_offset );
-      g.setColor( DARK_NEON_RED );
-      g.drawString( Character.toString(transmission), x_startPoint + x_offset, y_offset );
-    }
-
     /**
      *  Rotates speedometer needle.
      *  @param theta Degree needle makes with 0mph. Angle range [0, 300]. 
@@ -312,54 +325,102 @@ public class SpeedometerGUI implements ActionListener {
     private void rotateNeedle( Graphics g, int theta ) {
       theta = (theta - MAX_ANGLE) % (MAX_ANGLE + 1);
       rotateNeedle( g, theta, NEON_RED );
-      //rotateNeedle( g, prevTheta, NEON_RED );
-    }
-
-
-
-    /**
-     * TODO 
-     */
-    public void setInDrive( Graphics g ) {
-      setTransmission( g, 'D' );
     }
 
     /**
      * TODO 
      */
-    public void setInPark( Graphics g ) {
-      setTransmission( g, 'P' );
+    private void setTransmission( Graphics g, Transmission state ) {
+      String label = TRANSMISSION_LABEL;
+    
+      char transmission = state.toString().charAt(0);
+      g.setFont( transmissionFont );
+      int x_startPoint = (int)(center.x - transmission_width / 2.0); 
+      int x_offset = g.getFontMetrics().stringWidth( label.substring(0, label.indexOf(transmission)) );
+      int y_offset = center.y + 3 * MPH_offset;
+      g.setColor( Color.WHITE );
+      g.drawString( label, x_startPoint, y_offset );
+      g.setColor( DARK_NEON_RED );
+      g.drawString( Character.toString(transmission), x_startPoint + x_offset, y_offset );
     }
 
-    /**
-     * TODO 
-     */
-    public void setInReverse( Graphics g ) {
-      setTransmission( g, 'R' );
-    }
+  } /* class renderPanel */
 
+  /**
+   * TODO
+   */
+  public double map( int value, int min, int max, int newMin, int newMax ) {
+    if( min > max || newMin > newMax ) return 0;
+    if( value < min || value > max ) value = min;
+    return newMin + ((double)value) / (max - min) * (newMax - newMin);
   }
 
+  /**
+   * TODO
+   */
+  public void setSpeed( int speed ) {
+    if( speed < MIN_SPEED ) speed = MIN_SPEED;
+    else if( speed > MAX_SPEED ) speed = MAX_SPEED;
+    currentTheta = (int) map( speed, MIN_SPEED, MAX_SPEED, MIN_ANGLE, MAX_ANGLE );
+  }
+
+  /**
+   * TODO
+   */
+  public void setInDrive() {
+    transmission_state = Transmission.DRIVE;
+  }
+
+  /**
+   * TODO
+   */
+  public void setInPark() {
+    transmission_state = Transmission.PARK;
+  }
+
+  /**
+   * TODO
+   */
+  public void setInReverse() {
+    transmission_state = Transmission.REVERSE;
+  }
+
+  /**
+   * TODO
+   */
+  public int getMinSpeed() {
+    return MIN_SPEED;
+  }
+
+  /**
+   * TODO
+   */
+  public int getMaxSpeed() {
+    return MAX_SPEED;
+  }
+
+  /**
+   * TODO
+   */
   public static void main( String[] args ) {
     SpeedometerGUI speedometer = new SpeedometerGUI();
 
     /*
     boolean increasing = true;
-    int theta = 0;
+    int speed = speedometer.getMinSpeed();
+
     while( true ) {
-      speedometer.rotateNeedle( theta );
+      speedometer.setSpeed( speed );
 
-      if( theta == 0 ) speedometer.setInPark();
-      else if( theta == 150 ) speedometer.setInReverse();
-      else if( theta == 300 ) speedometer.setInDrive();
+      if( speed == speedometer.getMinSpeed() ) speedometer.setInPark();
+      else if( speed == speedometer.getMaxSpeed() / 2 ) speedometer.setInReverse();
+      else if( speed == speedometer.getMaxSpeed() ) speedometer.setInDrive();
 
-      if( theta ==  300 )   increasing = false;   
-      else if( theta == 0 ) increasing = true;
+      if( speed ==  speedometer.getMaxSpeed() )   increasing = false;   
+      else if( speed == speedometer.getMinSpeed() ) increasing = true;
 
-      if( increasing ) theta += 1;
-      else theta -= 1;
-
-      theta = theta % 301;
+      speed += ( increasing ) ? 1 : -1; 
+      speed = speed % speedometer.getMaxSpeed();
     }
     */
 
