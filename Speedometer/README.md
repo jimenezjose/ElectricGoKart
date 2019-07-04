@@ -4,7 +4,6 @@ Speedometer display interface used for the go-kart's dashboard. The speed of
 the go kart is fed through a peripheral microcontroller via serial
 comminication.
 
-## Prelimary Step to Compile or Run Speedometer
 ```
 cd Speedometer
 ```
