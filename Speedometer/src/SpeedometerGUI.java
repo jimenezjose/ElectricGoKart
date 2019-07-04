@@ -95,7 +95,6 @@ public class SpeedometerGUI implements ActionListener {
 
       speed += ( increasing ) ? 1 : -1; 
       speed = speed % ( getMaxSpeed() + 1 );
-      //currentTheta++;
     }
   }
 
@@ -404,25 +403,6 @@ public class SpeedometerGUI implements ActionListener {
    */
   public static void main( String[] args ) {
     SpeedometerGUI speedometer = new SpeedometerGUI();
-
-    /*
-    boolean increasing = true;
-    int speed = speedometer.getMinSpeed();
-
-    while( true ) {
-      speedometer.setSpeed( speed );
-
-      if( speed == speedometer.getMinSpeed() ) speedometer.setInPark();
-      else if( speed == speedometer.getMaxSpeed() / 2 ) speedometer.setInReverse();
-      else if( speed == speedometer.getMaxSpeed() ) speedometer.setInDrive();
-
-      if( speed ==  speedometer.getMaxSpeed() )   increasing = false;   
-      else if( speed == speedometer.getMinSpeed() ) increasing = true;
-
-      speed += ( increasing ) ? 1 : -1; 
-      speed = speed % speedometer.getMaxSpeed();
-    }
-    */
 
   }
 
