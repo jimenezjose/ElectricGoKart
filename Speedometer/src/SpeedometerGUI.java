@@ -11,12 +11,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 import javax.swing.Timer;
+import java.awt.event.*;
+import java.util.Vector;
 
 /**
  * TODO
  */
 public class SpeedometerGUI implements ActionListener {
-
 
   private static final Color LIGHT_BLACK     = new Color( 32, 32, 32 );
   private static final Color NEON_GREEN      = new Color( 0, 128, 0 );
@@ -41,7 +42,9 @@ public class SpeedometerGUI implements ActionListener {
   
   /* rendering panel with enabled double buffering */
   private JPanel renderPanel;
+  private JPanel northPanel;
   private Timer timer;
+  private JComboBox<String> portComboBox;
 
   boolean increasing = true;
   int speed = MIN_SPEED;
@@ -63,12 +66,33 @@ public class SpeedometerGUI implements ActionListener {
     main_frame.setBackground( Color.BLACK );
     main_frame.setResizable( true );
 
+    northPanel  = new JPanel();
     renderPanel = new RenderPanel();
     renderPanel.setBackground( Color.BLACK );
+
+    /* set layout for buttons/scrolls */
+    northPanel.setLayout( new BoxLayout(northPanel, BoxLayout.LINE_AXIS) );
+
+    /* background color of button panels */
+    northPanel.setBackground( Color.BLACK );
+
+    /* add content to north panel */
+    Vector<String> portList = SerialRoute.getInstance().getPortList();
+    portList.add( 0, "Disconnected" );
+    portComboBox = new JComboBox<String>( portList );
+
+    portComboBox.setMaximumSize( portComboBox.getPreferredSize() );
+    portComboBox.setSelectedItem( 0 );
+    portComboBox.addActionListener( this );
+
+    northPanel.add( Box.createHorizontalGlue() );
+    //northPanel.add( Box.createHorizontalGlue() );
+    northPanel.add( portComboBox );
 
     /* add rendering panel to jframe */
     Container contentPane = main_frame.getContentPane();
     contentPane.setBackground( Color.BLACK );
+    contentPane.add( northPanel, BorderLayout.NORTH );
     contentPane.add( renderPanel, BorderLayout.CENTER );
     contentPane.validate();
 
@@ -84,8 +108,11 @@ public class SpeedometerGUI implements ActionListener {
     if( evt.getSource() == timer ) {
       renderPanel.repaint();
 
-      setSpeed( speed );
+      /* input control */
+      if( speed > getMaxSpeed() ) speed = getMaxSpeed();
+      else if( speed < getMinSpeed() ) speed = getMinSpeed();
 
+      setSpeed( speed );
       if( speed == getMinSpeed() ) setInPark();
       else if( speed == getMaxSpeed() / 2 ) setInReverse();
       else if( speed == getMaxSpeed() ) setInDrive();
@@ -95,6 +122,21 @@ public class SpeedometerGUI implements ActionListener {
 
       speed += ( increasing ) ? 1 : -1; 
       speed = speed % ( getMaxSpeed() + 1 );
+    }
+    else if( evt.getSource() == portComboBox ) {
+      SerialRoute serialRoute = SerialRoute.getInstance();
+      String selectedPort = portComboBox.getSelectedItem().toString();
+      String noPort = portComboBox.getSelectedItem().toString();
+
+      if( serialRoute.connectTo( selectedPort ) ) {
+        System.out.println( "Connected: " + selectedPort );
+	System.out.println( "Dumping Data" );
+	serialRoute.dumpData();
+      }
+      else if( !selectedPort.equals(noPort) ) {
+        System.out.println( "Failed Connection: " + selectedPort );
+	portComboBox.setSelectedItem( 0 );
+      }
     }
   }
 

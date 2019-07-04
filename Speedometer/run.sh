@@ -1,5 +1,5 @@
 #!/bin/bash
-MAIN='SerialRoute'
+MAIN='SpeedometerGUI'
 BUILD_DIR='build'
 JAR_SOURCES='src/utility/lib/jSerialComm-2.5.1.jar'
 
