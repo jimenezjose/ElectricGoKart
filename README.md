@@ -1,4 +1,4 @@
-# goKart
+# Go_Kart
 How to make an Arduino go-kart [In Progress]
 
 ## [Video](https://www.youtube.com/channel/UCbjWL-dwOju9F-2Tt2TZt5A)
