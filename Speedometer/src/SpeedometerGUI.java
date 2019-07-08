@@ -84,9 +84,9 @@ public class SpeedometerGUI implements ActionListener {
     portComboBox.setMaximumSize( portComboBox.getPreferredSize() );
     portComboBox.setSelectedItem( 0 );
     portComboBox.addActionListener( this );
+    SerialRoute.getInstance().addActionListener(this);
 
     northPanel.add( Box.createHorizontalGlue() );
-    //northPanel.add( Box.createHorizontalGlue() );
     northPanel.add( portComboBox );
 
     /* add rendering panel to jframe */
@@ -105,39 +105,53 @@ public class SpeedometerGUI implements ActionListener {
    * TODO
    */
   public void actionPerformed( ActionEvent evt ) {
-    if( evt.getSource() == timer ) {
-      renderPanel.repaint();
-
-      /* input control */
-      if( speed > getMaxSpeed() ) speed = getMaxSpeed();
-      else if( speed < getMinSpeed() ) speed = getMinSpeed();
-
-      setSpeed( speed );
-      if( speed == getMinSpeed() ) setInPark();
-      else if( speed == getMaxSpeed() / 2 ) setInReverse();
-      else if( speed == getMaxSpeed() ) setInDrive();
-
-      if( speed ==  getMaxSpeed() ) increasing = false;   
-      else if( speed == getMinSpeed() ) increasing = true;
-
-      speed += ( increasing ) ? 1 : -1; 
-      speed = speed % ( getMaxSpeed() + 1 );
+    if( evt.getSource() == SerialRoute.getInstance() ) {
+      handleSerialRouteEvent( evt );
     }
-    else if( evt.getSource() == portComboBox ) {
+    if( evt.getSource() == timer ) {
+      /* animation handling fps */
+      renderPanel.repaint();
+    }
+    if( evt.getSource() == portComboBox ) {
+      handlePortComboBoxEvent( evt );
+    }
+  }
+
+  private void handleSerialRouteEvent( ActionEvent evt ) {
+      SerialRouteEvent serialEvt = (SerialRouteEvent) evt;
+      String data = serialEvt.getReceivedMessage();
+      if( isNumeric(data) ) {
+        speed = Integer.parseInt( serialEvt.getReceivedMessage() );
+        setSpeed( speed );
+      }
+  }
+
+  private void handlePortComboBoxEvent( ActionEvent evt ) {
       SerialRoute serialRoute = SerialRoute.getInstance();
       String selectedPort = portComboBox.getSelectedItem().toString();
-      String noPort = portComboBox.getSelectedItem().toString();
+      String noPort = portComboBox.getItemAt( 0 ).toString();
 
       if( serialRoute.connectTo( selectedPort ) ) {
         System.out.println( "Connected: " + selectedPort );
-	System.out.println( "Dumping Data" );
-	serialRoute.dumpData();
       }
-      else if( !selectedPort.equals(noPort) ) {
+      else if( selectedPort.equals(noPort) ) {
+        System.out.println( "Disconnected." );
+        SerialRoute.getInstance().disconnect();
+      }
+      else {
         System.out.println( "Failed Connection: " + selectedPort );
-	portComboBox.setSelectedItem( 0 );
+        portComboBox.setSelectedItem( 0 );
       }
-    }
+
+      if( portComboBox.getItemCount() - 1 != serialRoute.getAvailablePortCount() ) {
+        /* new available port detected. Update portComboBox */
+        portComboBox.removeAllItems();
+	portComboBox.addItem( "Disconnected" );
+        for( String port : serialRoute.getPortList() ) {
+	  portComboBox.addItem( port );
+	}
+      }
+      //TODO check if device is available after program execution
   }
 
   /**
@@ -396,6 +410,16 @@ public class SpeedometerGUI implements ActionListener {
     return newMin + ((double)value) / (max - min) * (newMax - newMin);
   }
 
+  public boolean isNumeric( String data ) {
+    try {
+      Integer.parseInt(data);
+    }
+    catch( NumberFormatException e ) {
+      return false;
+    }
+    return true;
+  }
+
   /**
    * TODO
    */
@@ -445,7 +469,6 @@ public class SpeedometerGUI implements ActionListener {
    */
   public static void main( String[] args ) {
     SpeedometerGUI speedometer = new SpeedometerGUI();
-
   }
 
 }
