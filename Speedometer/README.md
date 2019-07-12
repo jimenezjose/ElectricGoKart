@@ -6,7 +6,7 @@ comminication.
 
 ![Alt Text](https://github.com/jimenezjose/goKart/blob/master/images/SpeedometerGUI%20screenshot.png)
 
-_/Speedometer_
+_/_
 ```
 $ cd Speedometer
 ```
