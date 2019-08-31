@@ -34,7 +34,7 @@ public class SpeedometerGUI implements ActionListener {
   public static final int MIN_SPEED = 0;
   public static final int MIN_ANGLE = -150;
   public static final int MAX_ANGLE = 150;
-  private static final int DELAY    = 50;
+  private static final int DELAY    = 10;
 
   /* used to render speed of speedometer */
   private int currentTheta = MIN_ANGLE;
@@ -61,7 +61,8 @@ public class SpeedometerGUI implements ActionListener {
    */
   private void begin() {
     JFrame main_frame = new JFrame( "Speedometer Graphics" );
-    main_frame.setSize( 400, 400 );
+    main_frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+    main_frame.setUndecorated(true);
     main_frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
     main_frame.setBackground( Color.BLACK );
     main_frame.setResizable( true );
@@ -208,13 +209,15 @@ public class SpeedometerGUI implements ActionListener {
     private void drawSpeedometer( Graphics g ) {
       center = new Point( getWidth() / 2, getHeight() / 2 );
 
-      outer_diameter = (int)(double)(0.75 * Math.min( getWidth(), getHeight() ));
+      double GUAGE_SIZE = 1.3;
+
+      outer_diameter = (int)(double)(0.75 * GUAGE_SIZE * Math.min( getWidth(), getHeight() ));
       outer_radius   = (int)(double)(0.5 * outer_diameter);
-      diameter       = (int)(double)(0.7 * Math.min( getWidth(), getHeight() ));
+      diameter       = (int)(double)(0.7 * GUAGE_SIZE * Math.min( getWidth(), getHeight() ));
       radius         = (int)(double)(0.5 * diameter);
-      rim_diameter   = (int)(double)(0.69 * Math.min( getWidth(), getHeight() ));
+      rim_diameter   = (int)(double)(0.69 * GUAGE_SIZE * Math.min( getWidth(), getHeight() ));
       rim_radius     = (int)(double)(0.5 * rim_diameter);
-      inner_diameter = (int)(double)(0.05 * Math.min( getWidth(), getHeight() ));
+      inner_diameter = (int)(double)(0.05 * GUAGE_SIZE * Math.min( getWidth(), getHeight() ));
       inner_radius   = (int)(double)(0.5 * inner_diameter);
       needle_offset  = (int)(double)(0.1 * rim_radius);
       needle_width   = (int)(double)(0.15 * inner_radius);

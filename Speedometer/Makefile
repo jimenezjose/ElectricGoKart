@@ -11,6 +11,7 @@ src/utility/SerialRoute.java \
 src/utility/SerialRouteEvent.java 
 
 default:
+	mkdir -p $(BUILD_DIR)
 	javac -cp $(JAR_SOURCES) -g $(JAVA_SOURCES) -d $(BUILD_DIR)
 
 clean:
