@@ -6,7 +6,7 @@ How to make an Arduino go-kart [In Progress]
 ![Alt Text](https://github.com/jimenezjose/Go_Kart/blob/master/images/Rear_sprocket.jpeg)
 
 ## Speedometer Display
-![Alt Text](https://github.com/jimenezjose/Go_Kart/blob/master/images/Rear_sprocket.jpeg)
+![Alt Text](https://github.com/jimenezjose/Go_Kart/blob/master/images/SpeedometerGUI%20screenshot.png)
 
 ## Previous Prototype
 #### This [video](https://www.youtube.com/channel/UCbjWL-dwOju9F-2Tt2TZt5A) recording is about the engineering in prototype 1.
