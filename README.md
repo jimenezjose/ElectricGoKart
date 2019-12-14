@@ -1,5 +1,5 @@
 # Go_Kart
-How to make an Arduino go-kart [In Progress]
+How to make an Arduino go-kart [In Progress] 
 
 ## Current Go Kart
 ![Alt Text](https://github.com/jimenezjose/Go_Kart/blob/master/images/current_go_kart.JPG)
