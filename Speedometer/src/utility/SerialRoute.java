@@ -42,13 +42,6 @@ public class SerialRoute implements SerialPortMessageListener {
     return false;
   }
 
-  public void debug( String portName ) {
-    port = SerialPort.getCommPort( portName );
-    System.out.println(port.getSystemPortName());
-    port.openPort();
-    port.addDataListener( this );
-  }
-
   public void disconnect() {
     if( port != null && port.isOpen() ) {
       /* clean-up previous port connection */

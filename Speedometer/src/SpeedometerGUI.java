@@ -19,7 +19,7 @@ import java.util.Vector;
  */
 public class SpeedometerGUI implements ActionListener {
 
-  private static final boolean DEBUG_ON = true;
+  private static final boolean DEBUG_ON = false;
   /* color pallette */
   private static final Color LIGHT_BLACK     = new Color( 32, 32, 32 );
   private static final Color NEON_GREEN      = new Color( 0, 128, 0 );
@@ -186,10 +186,6 @@ public class SpeedometerGUI implements ActionListener {
    */
   private void handleDebugEvent( ActionEvent evt ) {
     System.out.println("debug event triggered");
-    SerialRoute serialRoute = SerialRoute.getInstance();
-    String myPort = "/dev/rfcomm0";
-
-    serialRoute.debug( myPort );
   }
 
 
