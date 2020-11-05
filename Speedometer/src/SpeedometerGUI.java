@@ -19,6 +19,8 @@ import java.util.Vector;
  */
 public class SpeedometerGUI implements ActionListener {
 
+  private static final boolean DEBUG_ON = true;
+  /* color pallette */
   private static final Color LIGHT_BLACK     = new Color( 32, 32, 32 );
   private static final Color NEON_GREEN      = new Color( 0, 128, 0 );
   private static final Color DARK_NEON_GREEN = new Color( 0, 100, 0 );
@@ -45,6 +47,7 @@ public class SpeedometerGUI implements ActionListener {
   private JPanel northPanel;
   private Timer timer;
   private JComboBox<String> portComboBox;
+  private JButton debugButton;
 
   boolean increasing = true;
   int speed = MIN_SPEED;
@@ -63,7 +66,7 @@ public class SpeedometerGUI implements ActionListener {
   private void begin() {
     JFrame main_frame = new JFrame( "Speedometer Graphics" );
     main_frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-    main_frame.setUndecorated(true);
+    if( !DEBUG_ON ) main_frame.setUndecorated(true);
     main_frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
     main_frame.setBackground( Color.BLACK );
     main_frame.setResizable( true );
@@ -82,12 +85,17 @@ public class SpeedometerGUI implements ActionListener {
     Vector<String> portList = SerialRoute.getInstance().getPortList();
     portList.add( 0, "Disconnected" );
     portComboBox = new JComboBox<String>( portList );
-
     portComboBox.setMaximumSize( portComboBox.getPreferredSize() );
     portComboBox.setSelectedItem( 0 );
+
+    debugButton = new JButton( "Debug" );
+    debugButton.setVisible( DEBUG_ON );
+
+    debugButton.addActionListener( this );
     portComboBox.addActionListener( this );
     SerialRoute.getInstance().addActionListener(this);
 
+    northPanel.add( debugButton );
     northPanel.add( Box.createHorizontalGlue() );
     northPanel.add( portComboBox );
 
@@ -119,6 +127,10 @@ public class SpeedometerGUI implements ActionListener {
     if( evt.getSource() == portComboBox ) {
       /* user attempting to connect device */
       handlePortComboBoxEvent( evt );
+    }
+    if( evt.getSource() == debugButton ) {
+      /* debuging */
+      handleDebugEvent( evt );
     }
   }
 
@@ -166,6 +178,21 @@ public class SpeedometerGUI implements ActionListener {
       }
       //TODO check if device is available after program execution
   }
+
+  /**
+   * For debugging purposes.
+   * @param evt Event triggered from debug button.
+   * @return Nothing.
+   */
+  private void handleDebugEvent( ActionEvent evt ) {
+    System.out.println("debug event triggered");
+    SerialRoute serialRoute = SerialRoute.getInstance();
+    String myPort = "/dev/rfcomm0";
+
+    serialRoute.debug( myPort );
+  }
+
+
 
   /**
    * Smooth graphic interface for speedometer.
