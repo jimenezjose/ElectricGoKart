@@ -15,7 +15,7 @@ import java.awt.event.*;
 import java.util.Vector;
 
 /**
- * TODO
+ * Speedometer interface with an asynchronous port reciever.
  */
 public class SpeedometerGUI implements ActionListener {
 
@@ -50,14 +50,15 @@ public class SpeedometerGUI implements ActionListener {
   int speed = MIN_SPEED;
 
   /**
-   *  Sets up the window behavior and graphics of the Speedometer GUI.
+   *  Constructor sets up the window behavior and graphics of the Speedometer GUI.
    */
   public SpeedometerGUI() {
     begin();
   }
 
   /**
-   * TODO
+   * Initial setup of GUI components.
+   * @return Nothing.
    */
   private void begin() {
     JFrame main_frame = new JFrame( "Speedometer Graphics" );
@@ -103,10 +104,12 @@ public class SpeedometerGUI implements ActionListener {
   }
 
   /**
-   * TODO
+   * Asynchronous tasks are being triggered.
+   * @param evt event that asynchronously got triggered.
    */
   public void actionPerformed( ActionEvent evt ) {
     if( evt.getSource() == SerialRoute.getInstance() ) {
+      /* user sending data to speedometer gui */
       handleSerialRouteEvent( evt );
     }
     if( evt.getSource() == timer ) {
@@ -114,10 +117,15 @@ public class SpeedometerGUI implements ActionListener {
       renderPanel.repaint();
     }
     if( evt.getSource() == portComboBox ) {
+      /* user attempting to connect device */
       handlePortComboBoxEvent( evt );
     }
   }
 
+  /**
+   * Set speed of speedometer based on device input.
+   * @param evt Event triggered by GUI recieving data from serial port.
+   */
   private void handleSerialRouteEvent( ActionEvent evt ) {
       SerialRouteEvent serialEvt = (SerialRouteEvent) evt;
       String data = serialEvt.getReceivedMessage();
@@ -127,6 +135,10 @@ public class SpeedometerGUI implements ActionListener {
       }
   }
 
+  /**
+   * UI for connecting device to speedometer.
+   * @param evt Event triggered from user changing device to connect to.
+   */
   private void handlePortComboBoxEvent( ActionEvent evt ) {
       SerialRoute serialRoute = SerialRoute.getInstance();
       String selectedPort = portComboBox.getSelectedItem().toString();
@@ -156,10 +168,10 @@ public class SpeedometerGUI implements ActionListener {
   }
 
   /**
-   * TODO
+   * Smooth graphic interface for speedometer.
    */
   private class RenderPanel extends JPanel {
-        /* speedometer needle and center point of GUI */
+    /* speedometer needle and center point of GUI */
     private RoundRectangle2D needle;
     private Point center;
 
@@ -186,7 +198,9 @@ public class SpeedometerGUI implements ActionListener {
     private int MPH_offset;
 
     /**
-     * TODO
+     * Render Speedometer graphics on display screen.
+     * @param g Graphics reference to screen.
+     * @return Nothing.
      */
     @Override
     protected void paintComponent( Graphics g ) {
@@ -195,16 +209,17 @@ public class SpeedometerGUI implements ActionListener {
     }
 
     /**
-     * TODO
+     * Draw components on screen.
+     * @return Nothing.
      */
     private void render( Graphics g ) {
       drawSpeedometer( g );
     }
 
     /**
-     *  Draws the speedometer design without needle.
+     *  Draws the speedometer design.
      *  @param g An abstract canvas for animations.
-     *  @return nothing.
+     *  @return Nothing.
      */
     private void drawSpeedometer( Graphics g ) {
       center = new Point( getWidth() / 2, getHeight() / 2 );
@@ -272,7 +287,7 @@ public class SpeedometerGUI implements ActionListener {
         speed++;
       }
 
-      /* speedometer needles */
+      /* speedometer needle */
       needle = new RoundRectangle2D.Double( center.x, center.y - rim_radius + needle_offset, needle_width, rim_radius - needle_offset, 6, 6 );
       rotateNeedle( g, currentTheta - MIN_ANGLE );
 
@@ -281,8 +296,6 @@ public class SpeedometerGUI implements ActionListener {
       g.fillOval( center.x - inner_radius, center.y - inner_radius, inner_diameter, inner_diameter );
       g.setColor( Color.BLACK );
       g.drawOval( center.x - inner_radius, center.y - inner_radius, inner_diameter, inner_diameter );
-
-
 
       /* draw MPH and Transmission labels */
       g.setFont( speedometerFont );
@@ -296,7 +309,12 @@ public class SpeedometerGUI implements ActionListener {
     }
 
     /**
-     * TODO
+     * Draws speed values around the speedometer.
+     * @param g Reference to current canvas.
+     * @param speed speed value to draw.
+     * @param theta angle that the speed should be drawn on the speedometer.
+     * @param color color of speed value to be drawn.
+     * @return Nothing.
      */
     private void drawSpeedDigit( Graphics g, int speed, double theta, Color color ) {
       double needle_radius = rim_radius - needle_offset; 
@@ -386,7 +404,10 @@ public class SpeedometerGUI implements ActionListener {
     }
 
     /**
-     * TODO 
+     * Sets transmission state of speedometer.
+     * @param g reference to screen canvas.
+     * @param state transmission state to be set.
+     * @return Nothing.
      */
     private void setTransmission( Graphics g, Transmission state ) {
       String label = TRANSMISSION_LABEL;
