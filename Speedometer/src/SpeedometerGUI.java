@@ -82,6 +82,7 @@ public class SpeedometerGUI implements ActionListener {
 
     /* add content to north panel */
     Vector<String> portList = SerialRoute.getInstance().getPortList();
+    portList.remove("ttyAMA0");
     portList.add( 0, "Disconnected" );
     portComboBox = new JComboBox<String>( portList );
     portComboBox.setMaximumSize( portComboBox.getPreferredSize() );
