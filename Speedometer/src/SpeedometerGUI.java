@@ -166,7 +166,7 @@ public class SpeedometerGUI implements ActionListener {
 
       System.out.println(selectedPort);
 
-      if( selectedPort == "ttyAMA0" ) {
+      if( selectedPort.equals("ttyAMA0") ) {
         /* inhibit weird rasberry pi behavior */
         selectedPort = "null";
       }
