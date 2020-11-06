@@ -6,33 +6,12 @@ comminication.
 
 ![Alt Text](https://github.com/jimenezjose/Go_Kart/blob/assets/images/SpeedometerGUI%20screenshot.png)
 
-_/_
+## How to Run Speedometer GUI: 
+(open your Terminal and run these following commands):
 ```
-$ cd Speedometer
-```
-
-## Compile Java Speedometer GUI
-
-_/Speedometer_
-```
-$ make
-```
-
-## Run Java Speedometer GUI
-
-_/Speedometer_
-```
+$ cd Go_Kart/Speedometer
 $ ./run.sh
 ```
+
 If permission is denied; enter `$ chmod u+x run.sh`. Then enter `$ ./run.sh` 
 again. This command allows run.sh to have executable permission from the user.
-
-<!--
-**OR**
-
-_/Speedometer_
-```
-$ cd build
-$ java -cp ../src/utility/lib/jSerialComm-2.5.1.jar:. SerialRoute
-```
--->
