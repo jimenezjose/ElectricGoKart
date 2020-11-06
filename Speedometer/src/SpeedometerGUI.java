@@ -164,8 +164,6 @@ public class SpeedometerGUI implements ActionListener {
       String selectedPort = portComboBox.getSelectedItem().toString();
       String noPort = portComboBox.getItemAt( 0 ).toString();
 
-      System.out.println(selectedPort);
-
       if( selectedPort.equals("ttyAMA0") ) {
         /* inhibit weird rasberry pi behavior */
         selectedPort = "null";
@@ -181,8 +179,9 @@ public class SpeedometerGUI implements ActionListener {
       }
       else {
         System.out.println( "Failed Connection: " + selectedPort );
-        portComboBox.setSelectedItem( 0 );
+        SerialRoute.getInstance().disconnect();
 	setSpeed( 0 );
+        portComboBox.setSelectedItem( 0 );
       }
 
       if( portComboBox.getItemCount() - 1 != serialRoute.getAvailablePortCount() ) {

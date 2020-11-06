@@ -1,6 +1,14 @@
 # Go_Kart
 How to make an Arduino go-kart [In Progress] 
 
+## How to Run Speedometer GUI: 
+(open your Terminal and run these following commands):
+```
+$ git clone https://github.com/jimenezjose/Go_Kart.git
+$ cd Go_Kart/Speedometer
+$ ./run.sh
+```
+
 ## Current Go Kart
 ![Alt Text](https://github.com/jimenezjose/Go_Kart/blob/master/images/current_go_kart.JPG)
 ![Alt Text](https://github.com/jimenezjose/Go_Kart/blob/master/images/Rear_sprocket.jpeg)
