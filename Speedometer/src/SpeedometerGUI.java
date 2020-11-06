@@ -162,10 +162,12 @@ public class SpeedometerGUI implements ActionListener {
       else if( selectedPort.equals(noPort) ) {
         System.out.println( "Disconnected." );
         SerialRoute.getInstance().disconnect();
+	setSpeed( 0 );
       }
       else {
         System.out.println( "Failed Connection: " + selectedPort );
         portComboBox.setSelectedItem( 0 );
+	setSpeed( 0 );
       }
 
       if( portComboBox.getItemCount() - 1 != serialRoute.getAvailablePortCount() ) {
