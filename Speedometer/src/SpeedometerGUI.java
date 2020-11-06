@@ -147,7 +147,6 @@ public class SpeedometerGUI implements ActionListener {
     }
     else if( isTransmissionData(data) ) {
       /* input is tranmission state */
-      System.out.println(data);
       for( Transmission state : Transmission.values() ) {
         if( state.toString().charAt(0) == Character.toUpperCase(data.charAt(0)) ) {
           setTransmission(state);
@@ -503,7 +502,6 @@ public class SpeedometerGUI implements ActionListener {
     char data_value = data.charAt(0);
     for( Transmission state : Transmission.values() ) {
       if(state.toString().charAt(0) == Character.toUpperCase(data_value) ) {
-        System.out.println(state.toString());
         return true;
       }
     }
