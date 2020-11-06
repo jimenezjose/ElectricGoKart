@@ -29,8 +29,6 @@ public class SpeedometerGUI implements ActionListener {
   private static final Color DARK_NEON_RED   = new Color( 200, 0, 0 );
   private static final String TRANSMISSION_LABEL = "P  R  D";
   private static final String MPH_LABEL          = "MPH";
-  /* Transmission types */
-  private enum Transmission { PARK, REVERSE, DRIVE }
 
   public static final int MAX_SPEED = 120;
   public static final int MIN_SPEED = 0;
@@ -38,7 +36,8 @@ public class SpeedometerGUI implements ActionListener {
   public static final int MAX_ANGLE = 150;
   private static final int DELAY    = 10;
 
-  /* used to render speed of speedometer */
+  /* Transmission / speedometer needle angle */
+  private enum Transmission { PARK, REVERSE, DRIVE }
   private int currentTheta = MIN_ANGLE;
   private Transmission transmission_state = Transmission.PARK;
   
@@ -139,12 +138,21 @@ public class SpeedometerGUI implements ActionListener {
    * @param evt Event triggered by GUI recieving data from serial port.
    */
   private void handleSerialRouteEvent( ActionEvent evt ) {
-      SerialRouteEvent serialEvt = (SerialRouteEvent) evt;
-      String data = serialEvt.getReceivedMessage();
-      if( isNumeric(data) ) {
-        speed = Integer.parseInt( serialEvt.getReceivedMessage() );
-        setSpeed( speed );
+    SerialRouteEvent serialEvt = (SerialRouteEvent) evt;
+    String data = serialEvt.getReceivedMessage();
+    if( isNumeric(data) ) {
+      /* input is speed */
+      speed = Integer.parseInt( serialEvt.getReceivedMessage() );
+      setSpeed( speed );
+    }
+    else if( isTransmissionData(data) ) {
+      /* input is tranmission state */
+      for( Transmission state : Transmission.values() ) {
+        if( state.toString().charAt(0) == Character.toUpperCase(data.charAt(0)) ) {
+          setTransmission(state);
+        }
       }
+    }
   }
 
   /**
@@ -451,7 +459,13 @@ public class SpeedometerGUI implements ActionListener {
   } /* class renderPanel */
 
   /**
-   * TODO
+   * Maps value in range [min, max] to proportional range [newMin, newMax].
+   * @param value Number to mapped.
+   * @param min Current minimum of value range.
+   * @param max Current maximum of value range.
+   * @param newMin New minimum of mapped range.
+   * @param newMax New maximum of mapped range.
+   * @return new value in from new range.
    */
   public double map( int value, int min, int max, int newMin, int newMax ) {
     if( min > max || newMin > newMax ) return 0;
@@ -459,6 +473,11 @@ public class SpeedometerGUI implements ActionListener {
     return newMin + ((double)value) / (max - min) * (newMax - newMin);
   }
 
+  /**
+   * Checks if data is a number.
+   * @param data string of bytes to be interpretted.
+   * @return True if data is a numerical value, false otherwise.
+   */
   public boolean isNumeric( String data ) {
     try {
       Integer.parseInt(data);
@@ -470,7 +489,29 @@ public class SpeedometerGUI implements ActionListener {
   }
 
   /**
-   * TODO
+   * Checks if data is for transmission.
+   * @param data string of bytes to be interpretted.
+   * @return True if data is correctly formatted for the transmission, 
+   *         false otherwise.
+   */
+  public boolean isTransmissionData( String data ) {
+    if( data.length() != 1 ) {
+      /* must be single character input */
+      return false;
+    }
+    char data_value = data.charAt(0);
+    for( Transmission state : Transmission.values() ) {
+      if(state.toString().charAt(0) == Character.toUpperCase(data_value) ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Setter for the speed to be displayed on the speedometer.
+   * @param speed numerical speed expected to be [0, 120].
+   * @return Nothing.
    */
   public void setSpeed( int speed ) {
     if( speed < MIN_SPEED ) speed = MIN_SPEED;
@@ -479,42 +520,30 @@ public class SpeedometerGUI implements ActionListener {
   }
 
   /**
-   * TODO
+   * Setter for the transmission state of the speedometer.
+   * @param state Transmission state {park, reverse, drive}.
+   * @return Nothing.
    */
-  public void setInDrive() {
-    transmission_state = Transmission.DRIVE;
+  public void setTransmission( Transmission state ) {
+    transmission_state = state;
   }
 
   /**
-   * TODO
-   */
-  public void setInPark() {
-    transmission_state = Transmission.PARK;
-  }
-
-  /**
-   * TODO
-   */
-  public void setInReverse() {
-    transmission_state = Transmission.REVERSE;
-  }
-
-  /**
-   * TODO
+   * Getter for the minimum speed on speedometer.
    */
   public int getMinSpeed() {
     return MIN_SPEED;
   }
 
   /**
-   * TODO
+   * Getter for the maximum speed on speedometer.
    */
   public int getMaxSpeed() {
     return MAX_SPEED;
   }
 
   /**
-   * TODO
+   * Main driver of the speedometer GUI.
    */
   public static void main( String[] args ) {
     SpeedometerGUI speedometer = new SpeedometerGUI();
