@@ -82,8 +82,8 @@ public class SpeedometerGUI implements ActionListener {
 
     /* add content to north panel */
     Vector<String> portList = SerialRoute.getInstance().getPortList();
-    portList.remove("ttyAMA0");
     portList.add( 0, "Disconnected" );
+    portList.remove("ttyAMA0");
     portComboBox = new JComboBox<String>( portList );
     portComboBox.setMaximumSize( portComboBox.getPreferredSize() );
     portComboBox.setSelectedItem( 0 );
@@ -165,6 +165,11 @@ public class SpeedometerGUI implements ActionListener {
       String selectedPort = portComboBox.getSelectedItem().toString();
       String noPort = portComboBox.getItemAt( 0 ).toString();
 
+      if( selectedPort == "ttyAMA0" ) {
+        /* inhibit weird rasberry pi behavior */
+        selectedPort = "null";
+      }
+
       if( serialRoute.connectTo( selectedPort ) ) {
         System.out.println( "Connected: " + selectedPort );
       }
@@ -184,6 +189,7 @@ public class SpeedometerGUI implements ActionListener {
         portComboBox.removeAllItems();
 	portComboBox.addItem( "Disconnected" );
         for( String port : serialRoute.getPortList() ) {
+	  if( port == "ttyAMA0" ) continue;
 	  portComboBox.addItem( port );
 	}
       }
