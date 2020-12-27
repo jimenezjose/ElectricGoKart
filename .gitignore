@@ -1,2 +1,4 @@
 *.class
 *.swp
+compile.sh
+upload.sh
