@@ -19,7 +19,7 @@ import java.util.Vector;
  */
 public class SpeedometerGUI implements ActionListener {
 
-  private static final boolean DEBUG_ON = false;
+  private static final boolean DEBUG_ON = true;
   /* color pallette */
   private static final Color LIGHT_BLACK     = new Color( 32, 32, 32 );
   private static final Color NEON_GREEN      = new Color( 0, 128, 0 );
@@ -50,6 +50,7 @@ public class SpeedometerGUI implements ActionListener {
 
   boolean increasing = true;
   int speed = MIN_SPEED;
+  double batteryPercentage = 1;
 
   /**
    *  Constructor sets up the window behavior and graphics of the Speedometer GUI.
@@ -140,18 +141,15 @@ public class SpeedometerGUI implements ActionListener {
   private void handleSerialRouteEvent( ActionEvent evt ) {
     SerialRouteEvent serialEvt = (SerialRouteEvent) evt;
     String data = serialEvt.getReceivedMessage();
-    if( isNumeric(data) ) {
+    if( isSpeedData(data) ) {
       /* input is speed */
-      speed = Integer.parseInt( serialEvt.getReceivedMessage() );
-      setSpeed( speed );
+      setSpeed( data );
     }
     else if( isTransmissionData(data) ) {
-      /* input is tranmission state */
-      for( Transmission state : Transmission.values() ) {
-        if( state.toString().charAt(0) == Character.toUpperCase(data.charAt(0)) ) {
-          setTransmission(state);
-        }
-      }
+      setTransmission( data );
+    }
+    else if( isBatteryPercentageData(data) ) {
+      setBatteryPercentage( data );
     }
   }
 
@@ -175,22 +173,22 @@ public class SpeedometerGUI implements ActionListener {
       else if( selectedPort.equals(noPort) ) {
         System.out.println( "Disconnected." );
         SerialRoute.getInstance().disconnect();
-	setSpeed( 0 );
+	      setSpeed( 0 );
       }
       else {
         System.out.println( "Failed Connection: " + selectedPort );
         SerialRoute.getInstance().disconnect();
-	setSpeed( 0 );
+	      setSpeed( 0 );
         portComboBox.setSelectedItem( 0 );
       }
 
       if( portComboBox.getItemCount() - 1 != serialRoute.getAvailablePortCount() ) {
         /* new available port detected. Update portComboBox */
         portComboBox.removeAllItems();
-	portComboBox.addItem( "Disconnected" );
+	      portComboBox.addItem( "Disconnected" );
         for( String port : serialRoute.getPortList() ) {
-	  portComboBox.addItem( port );
-	}
+	        portComboBox.addItem( port );
+	      }
       }
       //TODO check if device is available after program execution
   }
@@ -203,8 +201,6 @@ public class SpeedometerGUI implements ActionListener {
   private void handleDebugEvent( ActionEvent evt ) {
     System.out.println("debug event triggered");
   }
-
-
 
   /**
    * Smooth graphic interface for speedometer.
@@ -253,7 +249,33 @@ public class SpeedometerGUI implements ActionListener {
      */
     private void render( Graphics g ) {
       drawSpeedometer( g );
+      drawBatteryCapacity( g );
     }
+
+    /**
+     * Draws Battery Capacity of go kart motor battery pack.
+     * @param g An abstract canvas for animations.
+     * @return Nothing.
+     */
+    private void drawBatteryCapacity( Graphics g ) {
+      center = new Point( getWidth() / 2, getHeight() / 2 );
+      double BATTERY_GUAGE = 0.5 * diameter / Math.min( getWidth(), getHeight() );
+
+      int battery_width   = (int)(double)(BATTERY_GUAGE * Math.min(0.5 * diameter, getWidth() - center.x - outer_radius));
+      int battery_height  = (int)(double)(0.4 * battery_width);
+      int terminal_width  = (int)(double)(0.05 * battery_width);
+      int terminal_height = (int)(double)(0.33 * battery_height);
+      int battery_x  = (int)(double)(center.x + outer_radius + 0.5 * BATTERY_GUAGE * (getWidth() - center.x - outer_radius));
+      int battery_y  = (int)(double)(getHeight() - 2 * battery_height);
+      int terminal_x = (int)(double)(battery_x + battery_width);
+      int terminal_y = (int)(double)(battery_y + 0.33 * battery_height);
+
+      g.setColor( Color.WHITE );
+      g.drawRoundRect(battery_x, battery_y, battery_width, battery_height, 6, 6);
+      g.fillArc(terminal_x, terminal_y, terminal_width, terminal_height, -90, 180);
+
+      g.fillRoundRect(battery_x + 2, battery_y + 2, (int) batteryPercentage * (battery_width - 4), battery_height - 4, 6, 6);
+    } 
 
     /**
      *  Draws the speedometer design.
@@ -495,19 +517,66 @@ public class SpeedometerGUI implements ActionListener {
   }
 
   /**
+   * Checks if data string is formatted as speed data.
+   * @param data String of data.
+   * @return True if data is in the format "Speed: {numbder}".
+   */
+  private boolean isSpeedData( String data ) {
+    /* expected format "Speed: {number}" */
+    String[] tokens = data.toLowerCase().split("speed: ");
+    if( tokens.length != 2 || !isNumeric(tokens[1]) ) {
+      /* incorrect format */ 
+      return false;
+    }
+    int value = Integer.parseInt(tokens[1]);
+    if(value < 0 || value > MAX_SPEED) {
+      /* out of range */
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Checks if data string is formatted as battery percentage data.
+   * @param data String of data.
+   * @return True if data is in the format "Battery Percentage: {numbder}".
+   */
+  private boolean isBatteryPercentageData( String data ) {
+    /* expected format "Battery Percentage: {number}" */
+    String[] tokens = data.toLowerCase().split("battery percentage: ");
+    if( tokens.length != 2 || !isNumeric(tokens[1]) ) {
+      /* incorrect format */
+      return false;
+    }
+    int value = Integer.parseInt(tokens[1]);
+    if( value < 0 || value > 100 ) {
+      /* out of range */
+      return false;
+    }
+    return true; 
+  }
+
+  /**
    * Checks if data is for transmission.
    * @param data string of bytes to be interpretted.
    * @return True if data is correctly formatted for the transmission, 
    *         false otherwise.
    */
   public boolean isTransmissionData( String data ) {
-    if( data.length() != 1 ) {
+    /* expected format "Transmission: {state}" */
+    String[] tokens = data.toLowerCase().split("transmission: ");
+    if( tokens.length != 2 ) {
+      /* incorrect format */
+      return false;
+    }
+    if( tokens[1].length() != 1 ) {
       /* must be single character input */
       return false;
     }
-    char data_value = data.charAt(0);
+    char value = tokens[1].charAt(0);
     for( Transmission state : Transmission.values() ) {
-      if(state.toString().charAt(0) == Character.toUpperCase(data_value) ) {
+      if(state.toString().charAt(0) == Character.toUpperCase(value) ) {
+        /* state exists {P,R,D} */
         return true;
       }
     }
@@ -524,6 +593,11 @@ public class SpeedometerGUI implements ActionListener {
     else if( speed > MAX_SPEED ) speed = MAX_SPEED;
     currentTheta = (int) map( speed, MIN_SPEED, MAX_SPEED, MIN_ANGLE, MAX_ANGLE );
   }
+  private void setSpeed( String data ) {
+    if( !isSpeedData(data) ) return;
+    String[] tokens = data.toLowerCase().split("speed: ");
+    setSpeed( Integer.parseInt(tokens[1]) );
+  }
 
   /**
    * Setter for the transmission state of the speedometer.
@@ -532,6 +606,29 @@ public class SpeedometerGUI implements ActionListener {
    */
   public void setTransmission( Transmission state ) {
     transmission_state = state;
+  }
+  private void setTransmission( String data ) {
+    if( !isTransmissionData(data) ) return;
+    String[] tokens = data.toLowerCase().split("transmission: ");
+    for( Transmission state : Transmission.values() ) {
+      if( state.toString().charAt(0) == Character.toUpperCase(tokens[1].charAt(0)) ) {
+        setTransmission(state);
+      }
+    }
+  }
+
+  /**
+   * Setter for the battery perdcentage of go kart battery pack.
+   * @param percentage battery percentage, [0, 100]
+   * @return Nothing.
+   */
+  public void setBatteryPercentage( int percentage ) {
+    batteryPercentage = percentage / 100.0;
+  }
+  private void setBatteryPercentage( String data ) {
+    if( !isBatteryPercentageData(data) ) return;
+    String[] tokens = data.toLowerCase().split("battery percentage: ");
+    setBatteryPercentage(Integer.parseInt(tokens[1]));
   }
 
   /**
