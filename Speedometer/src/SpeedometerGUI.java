@@ -19,7 +19,7 @@ import java.util.Vector;
  */
 public class SpeedometerGUI implements ActionListener {
 
-  private static final boolean DEBUG_ON = true;
+  private static final boolean DEBUG_ON = false;
   /* color pallette */
   private static final Color LIGHT_BLACK     = new Color( 32, 32, 32 );
   private static final Color NEON_GREEN      = new Color( 0, 128, 0 );
@@ -50,7 +50,7 @@ public class SpeedometerGUI implements ActionListener {
 
   boolean increasing = true;
   int speed = MIN_SPEED;
-  double batteryPercentage = 1;
+  double batteryPercentage = 0.75;
 
   /**
    *  Constructor sets up the window behavior and graphics of the Speedometer GUI.
@@ -232,6 +232,9 @@ public class SpeedometerGUI implements ActionListener {
     private int transmission_width;
     private int MPH_offset;
 
+    /* battery percentage specs */
+    private Font batteryPercentageFont;
+
     /**
      * Render Speedometer graphics on display screen.
      * @param g Graphics reference to screen.
@@ -269,12 +272,16 @@ public class SpeedometerGUI implements ActionListener {
       int battery_y  = (int)(double)(getHeight() - 2 * battery_height);
       int terminal_x = (int)(double)(battery_x + battery_width);
       int terminal_y = (int)(double)(battery_y + 0.33 * battery_height);
+      batteryPercentageFont = new Font( Font.SANS_SERIF, Font.PLAIN, (int)(0.4*battery_height));
 
       g.setColor( Color.WHITE );
       g.drawRoundRect(battery_x, battery_y, battery_width, battery_height, 6, 6);
       g.fillArc(terminal_x, terminal_y, terminal_width, terminal_height, -90, 180);
+      g.fillRoundRect(battery_x + 2, battery_y + 2, (int)(batteryPercentage * (battery_width - 4)), battery_height - 4, 6, 6);
 
-      g.fillRoundRect(battery_x + 2, battery_y + 2, (int) batteryPercentage * (battery_width - 4), battery_height - 4, 6, 6);
+      g.setFont( batteryPercentageFont );
+      int max_width = g.getFontMetrics().stringWidth( "100%" );
+      g.drawString( Integer.toString((int)(batteryPercentage * 100)) + "%", battery_x - max_width, battery_y + battery_height - (int)(0.3 * battery_height));
     } 
 
     /**
@@ -387,14 +394,14 @@ public class SpeedometerGUI implements ActionListener {
 
       if( speed == MAX_SPEED / 2 ) {
         /* center speed */
-	x -= g.getFontMetrics().stringWidth( Integer.toString(speed) ) / 2;
-	y += g.getFontMetrics().getHeight() / 4;
+	      x -= g.getFontMetrics().stringWidth( Integer.toString(speed) ) / 2;
+	      y += g.getFontMetrics().getHeight() / 4;
       }
 
       if( speed > MAX_SPEED / 2 ) {
         /* shift string reference on right half side of speedometer to */
-	/* bottom-right corner instead of bottom-left */
-	x -= g.getFontMetrics().stringWidth( Integer.toString(speed) );
+	      /* bottom-right corner instead of bottom-left */
+	      x -= g.getFontMetrics().stringWidth( Integer.toString(speed) );
       }
 
       if( speed > 10 && speed < 110 ) {
@@ -407,12 +414,12 @@ public class SpeedometerGUI implements ActionListener {
 
       if( speed == 50 ) {
         x -= g.getFontMetrics().stringWidth( Integer.toString(speed) ) / 4;
-	y += g.getFontMetrics().getHeight() / 4;
+	      y += g.getFontMetrics().getHeight() / 4;
       }
 
       if( speed == 70 ) {
         x += g.getFontMetrics().stringWidth( Integer.toString(speed) ) / 4;
-	y += g.getFontMetrics().getHeight() / 4;
+	      y += g.getFontMetrics().getHeight() / 4;
       }
 
       g.drawString( Integer.toString(speed), (int)(x), (int)(y) );
