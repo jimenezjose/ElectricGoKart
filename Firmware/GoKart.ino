@@ -1,3 +1,9 @@
+/*******************************************************************************
+                                                    Jose Jorge Jimenez-Olivas
+
+File Name:       GoKart.ino
+Description:     Main source file that manages the go-kart's electrical system. 
+*******************************************************************************/
 #include "Speedometer.h"
 
 Speedometer speedometer;
