@@ -6,7 +6,7 @@ How to make an Arduino go-kart [In Progress]
 ```
 $ git clone https://github.com/jimenezjose/Go_Kart.git
 $ cd Go_Kart/Speedometer
-$ ./runSpeedometer.sh
+$ ./runSpeedometerGUI.sh
 ```
 
 ## Current Go Kart
