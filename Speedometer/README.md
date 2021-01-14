@@ -10,7 +10,7 @@ comminication.
 (open your Terminal and run these following commands):
 ```
 $ cd Go_Kart/Speedometer
-$ ./run.sh
+$ ./runSpeedometerGUI.sh
 ```
 
 If permission is denied; enter `$ chmod u+x run.sh`. Then enter `$ ./run.sh` 
