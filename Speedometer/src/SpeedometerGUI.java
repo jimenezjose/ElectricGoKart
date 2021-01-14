@@ -252,7 +252,7 @@ public class SpeedometerGUI implements ActionListener {
      */
     private void render( Graphics g ) {
       drawSpeedometer( g );
-      drawBatteryCapacity( g );
+      //drawBatteryCapacity( g );
     }
 
     /**
