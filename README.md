@@ -1,6 +1,7 @@
 # Go_Kart
 How to make an Arduino go-kart [In Progress] 
 
+change Speedometer to Dashboard.<<<
 ## How to Run Speedometer GUI: 
 (open your Terminal and run these following commands):
 ```
