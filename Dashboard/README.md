@@ -19,7 +19,7 @@ $ ./runDashboardGUI.sh
     Source of [Help](https://learn.sparkfun.com/tutorials/how-to-run-a-raspberry-pi-program-on-startup/all)
 
 File: /home/pi/.config/autostart/speedometer.desktop
-```
+```bash
 [Desktop Entry]
 Type=Application
 Name=Dashboard
@@ -27,7 +27,7 @@ Exec/home/pi/dashboard.sh
 ```
 
 File: /home/pi/dashboard.sh
-```
+```bash
 #!/bin/bash
 export DISPLAY=:0.0
 # manually bind to bluetooth module via mac address
