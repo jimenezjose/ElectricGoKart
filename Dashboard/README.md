@@ -6,14 +6,14 @@ $ cd Go_Kart/Speedometer
 $ ./runDashboardGUI.sh
 ```
 
-## Dashboard display
+## Dashboard Display
 
     The speed of the go kart is fed through a peripheral microcontroller via serial
     comminication.
 
 ![Alt Text](https://github.com/jimenezjose/Go_Kart/blob/assets/images/SpeedometerGUI%20screenshot.png)
 
-#### My Rasberry pi configuration (for autostart)
+#### My Rasberry PI Configuration
     For completness of documentation, this is how I run the dashboard GUI on startup.
 
     Source of [Help](https://learn.sparkfun.com/tutorials/how-to-run-a-raspberry-pi-program-on-startup/all)
