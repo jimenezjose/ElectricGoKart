@@ -23,7 +23,7 @@ File: /home/pi/.config/autostart/speedometer.desktop
 [Desktop Entry]
 Type=Application
 Name=Dashboard
-Exec/home/pi/dashboard.sh
+Exec /home/pi/dashboard.sh
 ```
 
 File: /home/pi/dashboard.sh
