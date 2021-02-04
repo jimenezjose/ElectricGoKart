@@ -1,7 +1,7 @@
 /**
  * Author:      Jose Jimenez
- * File Name:   SpeedometerGUI.java   
- * Description: Vehicle Speedometer Graphical User Interface.
+ * File Name:   DashboardGUI.java   
+ * Description: Vehicle Dashboard Graphical User Interface.
  */
 
 import java.awt.*;
@@ -15,11 +15,11 @@ import java.awt.event.*;
 import java.util.Vector;
 
 /**
- * Speedometer interface with an asynchronous port reciever.
+ * Dashboard interface with an asynchronous port reciever.
  */
-public class SpeedometerGUI implements ActionListener {
+public class DashboardGUI implements ActionListener {
 
-  private static final boolean DEBUG_ON = false;
+  private static final boolean DEBUG_ON = true;
   /* color pallette */
   private static final Color LIGHT_BLACK     = new Color( 32, 32, 32 );
   private static final Color NEON_GREEN      = new Color( 0, 128, 0 );
@@ -34,7 +34,7 @@ public class SpeedometerGUI implements ActionListener {
   public static final int MIN_SPEED = 0;
   public static final int MIN_ANGLE = -150;
   public static final int MAX_ANGLE = 150;
-  private static final int DELAY    = 10;
+  private static final int DELAY    = 50;
 
   /* Transmission / speedometer needle angle */
   private enum Transmission { PARK, REVERSE, DRIVE }
@@ -52,10 +52,12 @@ public class SpeedometerGUI implements ActionListener {
   int speed = MIN_SPEED;
   double batteryPercentage = 0.75;
 
+  boolean locked = false;
+
   /**
-   *  Constructor sets up the window behavior and graphics of the Speedometer GUI.
+   *  Constructor sets up the window behavior and graphics of the Dashboard GUI.
    */
-  public SpeedometerGUI() {
+  public DashboardGUI() {
     begin();
   }
 
@@ -64,7 +66,7 @@ public class SpeedometerGUI implements ActionListener {
    * @return Nothing.
    */
   private void begin() {
-    JFrame main_frame = new JFrame( "Speedometer Graphics" );
+    JFrame main_frame = new JFrame( "Dashboard Graphics" );
     main_frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
     if( !DEBUG_ON ) main_frame.setUndecorated(true);
     main_frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
@@ -117,7 +119,7 @@ public class SpeedometerGUI implements ActionListener {
    */
   public void actionPerformed( ActionEvent evt ) {
     if( evt.getSource() == SerialRoute.getInstance() ) {
-      /* user sending data to speedometer gui */
+      /* user sending data to dashboard gui */
       handleSerialRouteEvent( evt );
     }
     if( evt.getSource() == timer ) {
@@ -154,7 +156,7 @@ public class SpeedometerGUI implements ActionListener {
   }
 
   /**
-   * UI for connecting device to speedometer.
+   * UI for connecting device to dashboard.
    * @param evt Event triggered from user changing device to connect to.
    */
   private void handlePortComboBoxEvent( ActionEvent evt ) {
@@ -200,10 +202,11 @@ public class SpeedometerGUI implements ActionListener {
    */
   private void handleDebugEvent( ActionEvent evt ) {
     System.out.println("debug event triggered");
+    locked = !locked;
   }
 
   /**
-   * Smooth graphic interface for speedometer.
+   * Smooth graphic interface for dashboard.
    */
   private class RenderPanel extends JPanel {
     /* speedometer needle and center point of GUI */
@@ -236,7 +239,7 @@ public class SpeedometerGUI implements ActionListener {
     private Font batteryPercentageFont;
 
     /**
-     * Render Speedometer graphics on display screen.
+     * Render Dashboard graphics on display screen.
      * @param g Graphics reference to screen.
      * @return Nothing.
      */
@@ -253,6 +256,33 @@ public class SpeedometerGUI implements ActionListener {
     private void render( Graphics g ) {
       drawSpeedometer( g );
       //drawBatteryCapacity( g );
+      if( locked ) {
+        drawLock( g );
+      }
+    }
+
+    public void drawLock( Graphics g) {
+      center = new Point( getWidth() / 2, getHeight() / 2 );
+      double theta = Math.PI / 6;
+
+      int lock_side      = (int)(double)(0.20 * outer_radius);
+      int shackle_height = (int)(double)(0.65 * lock_side);
+      int shackle_width  = (int)(double)( 0.9 * lock_side );
+      int shackle_guage  = (int)(double)(0.1 * lock_side);
+      int lock_x = (int)(double)( 0.5 * (center.x - outer_radius * Math.cos(theta) - lock_side) );
+      int lock_y = (int)(double)( center.y - outer_radius * Math.sin(theta) - lock_side);
+      int shackle_x = (int)(double)( lock_x + 0.5*(lock_side - shackle_width) );
+      int shackle_y = (int)(double)( lock_y - shackle_height );
+
+      g.setColor( Color.WHITE );
+      /* lock shackle */
+      g.fillOval(shackle_x, shackle_y, shackle_width, 2 * shackle_height);
+      g.setColor( Color.BLACK );
+      g.fillOval(shackle_x + shackle_guage, shackle_y + shackle_guage, shackle_width - 2*shackle_guage, 2 * (shackle_height - shackle_guage));
+      /* lock body */
+      g.drawRoundRect(lock_x, lock_y, lock_side, lock_side, 6, 6 );
+      g.setColor( Color.WHITE);
+      g.fillRoundRect(lock_x, lock_y, lock_side, lock_side, 6, 6 );
     }
 
     /**
@@ -653,10 +683,10 @@ public class SpeedometerGUI implements ActionListener {
   }
 
   /**
-   * Main driver of the speedometer GUI.
+   * Main driver of the dashboard GUI.
    */
   public static void main( String[] args ) {
-    SpeedometerGUI speedometer = new SpeedometerGUI();
+    DashboardGUI dashboard = new DashboardGUI();
   }
 
 }

@@ -6,7 +6,7 @@ BUILD_DIR=build
 JAR_SOURCES=\
 src/utility/lib/jSerialComm-2.5.1.jar
 JAVA_SOURCES=\
-src/SpeedometerGUI.java \
+src/DashboardGUI.java \
 src/utility/SerialRoute.java \
 src/utility/SerialRouteEvent.java 
 
