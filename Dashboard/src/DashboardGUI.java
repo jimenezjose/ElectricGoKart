@@ -153,6 +153,9 @@ public class DashboardGUI implements ActionListener {
     else if( isBatteryPercentageData(data) ) {
       setBatteryPercentage( data );
     }
+    else if( isLockedData(data) ) {
+      setLocked( data );
+    }
   }
 
   /**
@@ -202,7 +205,6 @@ public class DashboardGUI implements ActionListener {
    */
   private void handleDebugEvent( ActionEvent evt ) {
     System.out.println("debug event triggered");
-    locked = !locked;
   }
 
   /**
@@ -333,7 +335,7 @@ public class DashboardGUI implements ActionListener {
       inner_diameter = (int)(double)(0.05 * GUAGE_SIZE * Math.min( getWidth(), getHeight() ));
       inner_radius   = (int)(double)(0.5 * inner_diameter);
       needle_offset  = (int)(double)(0.1 * rim_radius);
-      needle_width   = (int)(double)(0.15 * inner_radius);
+      needle_width   = (int)(double)(0.3 * inner_radius);
       tensWidth      = (int)(double)(0.5 * inner_radius);
       tensOffset     = (int)(double)(0.5 * tensWidth);
       int markHeight       = (int)(double)(0.4 * needle_offset);
@@ -560,7 +562,7 @@ public class DashboardGUI implements ActionListener {
    */
   private boolean isSpeedData( String data ) {
     /* expected format "Speed: {number}" */
-    String[] tokens = data.toLowerCase().split("speed: ");
+    String[] tokens = data.split("Speed: ");
     if( tokens.length != 2 || !isNumeric(tokens[1]) ) {
       /* incorrect format */ 
       return false;
@@ -580,7 +582,7 @@ public class DashboardGUI implements ActionListener {
    */
   private boolean isBatteryPercentageData( String data ) {
     /* expected format "Battery Percentage: {number}" */
-    String[] tokens = data.toLowerCase().split("battery percentage: ");
+    String[] tokens = data.split("Battery Percentage: ");
     if( tokens.length != 2 || !isNumeric(tokens[1]) ) {
       /* incorrect format */
       return false;
@@ -593,6 +595,23 @@ public class DashboardGUI implements ActionListener {
     return true; 
   }
 
+  private boolean isLockedData( String data ) {
+    /* Expected format "Locked: {1 or 0}" */
+    String[] tokens = data.toLowerCase().split("Locked: ");
+   
+    if( tokens.length != 2 || !isNumeric(tokens[1]) ) {
+      /* incorrect format */
+      return false;
+    }
+    int value = Integer.parseInt(tokens[1]);
+    if( value != 0 || value != 1) {
+      /* invalid value */
+      return false;
+    }
+
+    return true;
+  }
+
   /**
    * Checks if data is for transmission.
    * @param data string of bytes to be interpretted.
@@ -601,7 +620,7 @@ public class DashboardGUI implements ActionListener {
    */
   public boolean isTransmissionData( String data ) {
     /* expected format "Transmission: {state}" */
-    String[] tokens = data.toLowerCase().split("transmission: ");
+    String[] tokens = data.split("Transmission: ");
     if( tokens.length != 2 ) {
       /* incorrect format */
       return false;
@@ -632,7 +651,7 @@ public class DashboardGUI implements ActionListener {
   }
   private void setSpeed( String data ) {
     if( !isSpeedData(data) ) return;
-    String[] tokens = data.toLowerCase().split("speed: ");
+    String[] tokens = data.split("Speed: ");
     setSpeed( Integer.parseInt(tokens[1]) );
   }
 
@@ -646,7 +665,7 @@ public class DashboardGUI implements ActionListener {
   }
   private void setTransmission( String data ) {
     if( !isTransmissionData(data) ) return;
-    String[] tokens = data.toLowerCase().split("transmission: ");
+    String[] tokens = data.split("Transmission: ");
     for( Transmission state : Transmission.values() ) {
       if( state.toString().charAt(0) == Character.toUpperCase(tokens[1].charAt(0)) ) {
         setTransmission(state);
@@ -655,8 +674,8 @@ public class DashboardGUI implements ActionListener {
   }
 
   /**
-   * Setter for the battery perdcentage of go kart battery pack.
-   * @param percentage battery percentage, [0, 100]
+   * Setter for the battery percentage of go kart battery pack.
+   * @param percentage battery percentage, [0, 100].
    * @return Nothing.
    */
   public void setBatteryPercentage( int percentage ) {
@@ -664,8 +683,22 @@ public class DashboardGUI implements ActionListener {
   }
   private void setBatteryPercentage( String data ) {
     if( !isBatteryPercentageData(data) ) return;
-    String[] tokens = data.toLowerCase().split("battery percentage: ");
-    setBatteryPercentage(Integer.parseInt(tokens[1]));
+    String[] tokens = data.split("Battery Percentage: ");
+    setBatteryPercentage( Integer.parseInt(tokens[1]) );
+  }
+
+  /**
+   * Setter for the locked state of the go kart.
+   * @param locked Go kart is in state locked.
+   * @return Nothing.
+   */
+  public void setLocked( boolean locked ) {
+    this.locked = locked;
+  }
+  private void setLocked( String data ) {
+    if( !isLockedData(data) ) return;
+    String[] tokens = data.split("Locked: ");
+    setLocked( Integer.parseInt(tokens[1]) == 1 );
   }
 
   /**
