@@ -13,11 +13,13 @@ import java.awt.BorderLayout;
 import javax.swing.Timer;
 import java.awt.event.*;
 import java.util.Vector;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.event.PopupMenuEvent;
 
 /**
  * Dashboard interface with an asynchronous port reciever.
  */
-public class DashboardGUI implements ActionListener {
+public class DashboardGUI implements ActionListener, PopupMenuListener {
 
   private static final boolean DEBUG_ON = false;
   /* color pallette */
@@ -29,6 +31,8 @@ public class DashboardGUI implements ActionListener {
   private static final Color DARK_NEON_RED   = new Color( 200, 0, 0 );
   private static final String TRANSMISSION_LABEL = "P  R  D";
   private static final String MPH_LABEL          = "MPH";
+
+  private static SerialRoute serialComm = SerialRoute.getInstance();
 
   public static final int MAX_SPEED = 120;
   public static final int MIN_SPEED = 0;
@@ -84,7 +88,7 @@ public class DashboardGUI implements ActionListener {
     northPanel.setBackground( Color.BLACK );
 
     /* add content to north panel */
-    Vector<String> portList = SerialRoute.getInstance().getPortList();
+    Vector<String> portList = serialComm.getPortList();
     portList.add( 0, "Disconnected" );
     portComboBox = new JComboBox<String>( portList );
     portComboBox.setMaximumSize( portComboBox.getPreferredSize() );
@@ -95,7 +99,9 @@ public class DashboardGUI implements ActionListener {
 
     debugButton.addActionListener( this );
     portComboBox.addActionListener( this );
-    SerialRoute.getInstance().addActionListener(this);
+    serialComm.addActionListener(this);
+    /* port combo box menu interaction events */
+    portComboBox.addPopupMenuListener( this );
 
     northPanel.add( debugButton );
     northPanel.add( Box.createHorizontalGlue() );
@@ -118,7 +124,7 @@ public class DashboardGUI implements ActionListener {
    * @param evt event that asynchronously got triggered.
    */
   public void actionPerformed( ActionEvent evt ) {
-    if( evt.getSource() == SerialRoute.getInstance() ) {
+    if( evt.getSource() == serialComm ) {
       /* user sending data to dashboard gui */
       handleSerialRouteEvent( evt );
     }
@@ -163,7 +169,6 @@ public class DashboardGUI implements ActionListener {
    * @param evt Event triggered from user changing device to connect to.
    */
   private void handlePortComboBoxEvent( ActionEvent evt ) {
-      SerialRoute serialRoute = SerialRoute.getInstance();
       String selectedPort = portComboBox.getSelectedItem().toString();
       String noPort = portComboBox.getItemAt( 0 ).toString();
 
@@ -172,31 +177,71 @@ public class DashboardGUI implements ActionListener {
         selectedPort = "null";
       }
 
-      if( serialRoute.connectTo( selectedPort ) ) {
+      if( serialComm.connectTo( selectedPort ) ) {
         System.out.println( "Connected: " + selectedPort );
       }
       else if( selectedPort.equals(noPort) ) {
         System.out.println( "Disconnected." );
-        SerialRoute.getInstance().disconnect();
+        serialComm.disconnect();
 	      setSpeed( 0 );
       }
       else {
         System.out.println( "Failed Connection: " + selectedPort );
-        SerialRoute.getInstance().disconnect();
+        serialComm.disconnect();
 	      setSpeed( 0 );
         portComboBox.setSelectedItem( 0 );
       }
-
-      if( portComboBox.getItemCount() - 1 != serialRoute.getAvailablePortCount() ) {
-        /* new available port detected. Update portComboBox */
-        portComboBox.removeAllItems();
-	      portComboBox.addItem( "Disconnected" );
-        for( String port : serialRoute.getPortList() ) {
-	        portComboBox.addItem( port );
-	      }
-      }
-      //TODO check if device is available after program execution
   }
+
+  /**
+   * Asynchronous update serial port list in combo box upon user interaction.
+   * @return Nothing.
+   */
+  @Override
+  public void popupMenuWillBecomeVisible( PopupMenuEvent evt ) {
+    updatePortComboBox();
+  }
+  /* required override for PopupMenuListener interface inheritance */
+  @Override
+  public void popupMenuWillBecomeInvisible( PopupMenuEvent evt ) {}
+  @Override
+  public void popupMenuCanceled( PopupMenuEvent evt ) {}
+
+  /**
+   * Updates the available port list in combo box.
+   * @return Nothing.
+   */
+  private void updatePortComboBox() {
+    /* current available ports */
+    Vector<String> portList = serialComm.getPortList();
+    portList.insertElementAt(portComboBox.getItemAt(0), 0); /* diconnected port */
+
+    /* remove items */
+    for( int index = 0; index < portComboBox.getItemCount(); index++ ) {
+      String item = portComboBox.getItemAt(index);
+      if( !portList.contains(item) ) {
+        portComboBox.removeItemAt(index);
+        index--; /* new item will shift into current position */
+      }
+    }
+
+    /* list is up to date */
+    if( portComboBox.getItemCount() ==  portList.size() ) return;
+
+    /* add items */
+    for( int index = 0; index < portList.size(); index++ ) {
+      /* utilizing strict item order */
+      String port = portList.elementAt( index );
+      String item = portComboBox.getItemAt( index );
+      if( item == null ) {
+        portComboBox.addItem( port );
+      }
+      else if( !item.equals(port) ) {
+        portComboBox.insertItemAt( port, index );
+      }
+    }
+  }
+
 
   /**
    * For debugging purposes.
