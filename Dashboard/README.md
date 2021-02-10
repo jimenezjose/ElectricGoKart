@@ -18,7 +18,7 @@ $ ./runDashboardGUI.sh
 
     Source of [Help](https://learn.sparkfun.com/tutorials/how-to-run-a-raspberry-pi-program-on-startup/all)
 
-File: /home/pi/.config/autostart/speedometer.desktop
+File: /home/pi/.config/autostart/dashboard.desktop
 ```desktop
 [Desktop Entry]
 Type=Application
