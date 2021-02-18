@@ -25,6 +25,7 @@ public class DashboardGUI implements ActionListener, PopupMenuListener {
   /* color pallette */
   private static final Color LIGHT_BLACK     = new Color( 32, 32, 32 );
   private static final Color NEON_GREEN      = new Color( 0, 128, 0 );
+  private static final Color NEON_BLUE      = new Color(8, 146, 208);
   private static final Color DARK_NEON_GREEN = new Color( 0, 100, 0 );
   private static final Color METALLIC_BLACK  = new Color( 50, 50, 50 );
   private static final Color NEON_RED        = new Color( 255, 0, 0 );
@@ -216,6 +217,15 @@ public class DashboardGUI implements ActionListener, PopupMenuListener {
     Vector<String> portList = serialComm.getPortList();
     portList.insertElementAt(portComboBox.getItemAt(0), 0); /* diconnected port */
 
+    /* currently connected device got disconnected */
+    String selectedPort = portComboBox.getSelectedItem().toString();
+    if( !portList.contains(selectedPort) ) {
+      /* reflect disconnection in front end */
+      serialComm.disconnect();
+      portComboBox.setSelectedIndex( 0 );
+      System.out.println("Disconnected.");
+    }
+
     /* remove items */
     for( int index = 0; index < portComboBox.getItemCount(); index++ ) {
       String item = portComboBox.getItemAt(index);
@@ -380,7 +390,7 @@ public class DashboardGUI implements ActionListener, PopupMenuListener {
       inner_diameter = (int)(double)(0.05 * GUAGE_SIZE * Math.min( getWidth(), getHeight() ));
       inner_radius   = (int)(double)(0.5 * inner_diameter);
       needle_offset  = (int)(double)(0.1 * rim_radius);
-      needle_width   = (int)(double)(0.3 * inner_radius);
+      needle_width   = (int)(double)(0.2 * inner_radius);
       tensWidth      = (int)(double)(0.5 * inner_radius);
       tensOffset     = (int)(double)(0.5 * tensWidth);
       int markHeight       = (int)(double)(0.4 * needle_offset);
