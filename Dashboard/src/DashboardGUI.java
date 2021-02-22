@@ -25,7 +25,7 @@ public class DashboardGUI implements ActionListener, PopupMenuListener {
   /* color pallette */
   private static final Color LIGHT_BLACK     = new Color( 32, 32, 32 );
   private static final Color NEON_GREEN      = new Color( 0, 128, 0 );
-  private static final Color NEON_BLUE      = new Color(8, 146, 208);
+  private static final Color NEON_BLUE       = new Color(0, 0, 255);
   private static final Color DARK_NEON_GREEN = new Color( 0, 100, 0 );
   private static final Color METALLIC_BLACK  = new Color( 50, 50, 50 );
   private static final Color NEON_RED        = new Color( 255, 0, 0 );
@@ -407,7 +407,7 @@ public class DashboardGUI implements ActionListener, PopupMenuListener {
       g.fillOval( center.x - outer_radius, center.y - outer_radius, outer_diameter, outer_diameter );
 
       /* green rim arc */
-      g.setColor( NEON_GREEN );
+      g.setColor( NEON_BLUE );
       g.fillArc( center.x - radius, center.y - radius, diameter, diameter, 300, MAX_ANGLE - MIN_ANGLE );
       g.setColor( LIGHT_BLACK );
       g.fillOval( center.x - rim_radius, center.y - rim_radius, rim_diameter, rim_diameter );
@@ -423,22 +423,22 @@ public class DashboardGUI implements ActionListener, PopupMenuListener {
       double theta = MIN_ANGLE;
 
       /* draw dash marks on Speedometer */
-      drawSpeedMark( g, tensMark, theta, NEON_GREEN );
-      drawSpeedDigit( g, speed, theta, NEON_GREEN );
+      drawSpeedMark( g, tensMark, theta, NEON_BLUE );
+      drawSpeedDigit( g, speed, theta, NEON_BLUE );
       theta += increment;
       speed++;
 
       for( ; theta < MAX_ANGLE; theta += increment ) {
         /* assign different sized dashes for speed marks */
         Rectangle2D speedMark;
-        Color markColor = NEON_GREEN;
+        Color markColor = NEON_BLUE;
 
         if( speed % 10 == 0 ) speedMark = tensMark;
         else if( speed % 5 == 0 ) speedMark = fiveMark;
         else speedMark = onesMark;
       
-        drawSpeedMark( g, speedMark, theta, NEON_GREEN );
-        if( speed % 10 == 0 ) drawSpeedDigit( g, speed, theta, NEON_GREEN );
+        drawSpeedMark( g, speedMark, theta, NEON_BLUE );
+        if( speed % 10 == 0 ) drawSpeedDigit( g, speed, theta, NEON_BLUE );
         speed++;
       }
 
