@@ -39,7 +39,7 @@ public class DashboardGUI implements ActionListener, PopupMenuListener {
   public static final int MIN_SPEED = 0;
   public static final int MIN_ANGLE = -150;
   public static final int MAX_ANGLE = 150;
-  private static final int DELAY    = 50;
+  private static final int DELAY    = 100;
 
   /* Transmission / speedometer needle angle */
   private enum Transmission { PARK, REVERSE, DRIVE }
@@ -322,7 +322,7 @@ public class DashboardGUI implements ActionListener, PopupMenuListener {
       center = new Point( getWidth() / 2, getHeight() / 2 );
       double theta = Math.PI / 6;
 
-      int lock_side      = (int)(double)(0.20 * outer_radius);
+      int lock_side      = (int)(double)(0.15 * outer_radius);
       int shackle_height = (int)(double)(0.65 * lock_side);
       int shackle_width  = (int)(double)( 0.9 * lock_side );
       int shackle_guage  = (int)(double)(0.1 * lock_side);
@@ -652,14 +652,13 @@ public class DashboardGUI implements ActionListener, PopupMenuListener {
 
   private boolean isLockedData( String data ) {
     /* Expected format "Locked: {1 or 0}" */
-    String[] tokens = data.toLowerCase().split("Locked: ");
-   
+    String[] tokens = data.split("Locked: ");
     if( tokens.length != 2 || !isNumeric(tokens[1]) ) {
       /* incorrect format */
       return false;
     }
     int value = Integer.parseInt(tokens[1]);
-    if( value != 0 || value != 1) {
+    if( value != 0 && value != 1) {
       /* invalid value */
       return false;
     }
