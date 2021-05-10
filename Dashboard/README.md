@@ -25,6 +25,7 @@ Type=Application
 Name=Dashboard
 Exec /home/pi/dashboard.sh
 ```
+Note: dashboard.sh must be executable to the user. "chmod u+x /home/pi/dashboard.sh"
 
 File: /home/pi/dashboard.sh
 ```bash
