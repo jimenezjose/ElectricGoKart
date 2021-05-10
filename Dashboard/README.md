@@ -31,8 +31,8 @@ File: /home/pi/dashboard.sh
 ```bash
 #!/bin/bash
 export DISPLAY=:0.0
-# manually bind to bluetooth module via mac address
-# help: "hcitool scan" # to find mac address
+# how to bind HC-05 to raspberry pi: https://dev.to/ivanmoreno/how-to-connect-raspberry-pi-with-hc-05-bluetooth-module-arduino-programm-3h7a
+# manually bind to bluetooth module via mac address. use "hcitool scan" to find mac address  
 sudo rfcomm bind /dev/rfcomm0 XX:XX:XX:XX:XX:XX
 cd $HOME/Go_Kart/Dashboard
 bash runDashboardGUI.sh
