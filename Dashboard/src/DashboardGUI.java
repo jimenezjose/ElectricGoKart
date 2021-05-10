@@ -15,6 +15,8 @@ import java.awt.event.*;
 import java.util.Vector;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.event.PopupMenuEvent;
+import java.awt.GraphicsEnvironment;
+import java.awt.GraphicsDevice;
 
 /**
  * Dashboard interface with an asynchronous port reciever.
@@ -25,7 +27,8 @@ public class DashboardGUI implements ActionListener, PopupMenuListener {
   /* color pallette */
   private static final Color LIGHT_BLACK     = new Color( 32, 32, 32 );
   private static final Color NEON_GREEN      = new Color( 0, 128, 0 );
-  private static final Color NEON_BLUE       = new Color(0, 0, 255);
+  private static final Color NEON_BLUE = NEON_GREEN;
+  //private static final Color NEON_BLUE       = new Color(0, 0, 255);
   private static final Color DARK_NEON_GREEN = new Color( 0, 100, 0 );
   private static final Color METALLIC_BLACK  = new Color( 50, 50, 50 );
   private static final Color NEON_RED        = new Color( 255, 0, 0 );
@@ -73,7 +76,9 @@ public class DashboardGUI implements ActionListener, PopupMenuListener {
   private void begin() {
     JFrame main_frame = new JFrame( "Dashboard Graphics" );
     main_frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-    if( !DEBUG_ON ) main_frame.setUndecorated(true);
+    //if( !DEBUG_ON ) main_frame.setUndecorated(true);
+    GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
+    device.setFullScreenWindow(main_frame);
     main_frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
     main_frame.setBackground( Color.BLACK );
     main_frame.setResizable( true );
@@ -260,6 +265,7 @@ public class DashboardGUI implements ActionListener, PopupMenuListener {
    */
   private void handleDebugEvent( ActionEvent evt ) {
     System.out.println("debug event triggered");
+
   }
 
   /**
