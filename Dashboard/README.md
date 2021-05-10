@@ -23,7 +23,7 @@ File: /home/pi/.config/autostart/dashboard.desktop
 [Desktop Entry]
 Type=Application
 Name=Dashboard
-Exec /home/pi/dashboard.sh
+Exec=/home/pi/dashboard.sh
 ```
 Note: dashboard.sh must be executable to the user. "chmod u+x /home/pi/dashboard.sh"
 
