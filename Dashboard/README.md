@@ -34,7 +34,7 @@ export DISPLAY=:0.0
 # manually bind to bluetooth module via mac address
 # help: "hcitool scan" # to find mac address
 sudo rfcomm bind /dev/rfcomm0 XX:XX:XX:XX:XX:XX
-cd $HOME/Go_Kart/Speedometer
+cd $HOME/Go_Kart/Dashboard
 bash runDashboardGUI.sh
 ```
 
