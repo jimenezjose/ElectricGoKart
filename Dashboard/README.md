@@ -31,7 +31,7 @@ File: /home/pi/dashboard.sh
 #!/bin/bash
 export DISPLAY=:0.0
 # manually bind to bluetooth module via mac address
-# help: hcitool scan # to find mac address
+# help: "hcitool scan" # to find mac address
 sudo rfcomm bind /dev/rfcomm0 XX:XX:XX:XX:XX:XX
 cd $HOME/Go_Kart/Speedometer
 bash runDashboardGUI.sh
