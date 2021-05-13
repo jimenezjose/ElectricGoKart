@@ -1,18 +1,21 @@
 /*******************************************************************************
                                                     Jose Jorge Jimenez-Olivas
 
-File Name:       GoKart.ino
+File Name:       ECU.ino
 Description:     Main source file that manages the go-kart's electrical system. 
 *******************************************************************************/
-#include "Speedometer.h"
 
-Speedometer speedometer;
+#include "Dashboard.h"
+
+const int throttle = A0;
+const int lockSwitch = 6;
+
+Dashboard dashboard(throttle, lockSwitch);
 
 void setup() {
-    Serial.begin(9600);
-    speedometer.init();
+    dashboard.init();
 }
 
 void loop() {
-    speedometer.run();
+    dashboard.run();
 }

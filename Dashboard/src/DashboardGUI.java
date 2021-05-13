@@ -23,7 +23,7 @@ import java.awt.GraphicsDevice;
  */
 public class DashboardGUI implements ActionListener, PopupMenuListener {
 
-  private static final boolean DEBUG_ON = false;
+  private static final boolean DEBUG_ON = true;
   /* color pallette */
   private static final Color LIGHT_BLACK     = new Color( 32, 32, 32 );
   private static final Color NEON_GREEN      = new Color( 0, 128, 0 );
@@ -155,7 +155,6 @@ public class DashboardGUI implements ActionListener, PopupMenuListener {
   private void handleSerialRouteEvent( ActionEvent evt ) {
     SerialRouteEvent serialEvt = (SerialRouteEvent) evt;
     String data = serialEvt.getReceivedMessage();
-    System.err.println(data);
     if( isSpeedData(data) ) {
       /* input is speed */
       setSpeed( data );
