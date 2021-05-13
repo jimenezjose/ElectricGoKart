@@ -78,7 +78,7 @@ public class DashboardGUI implements ActionListener, PopupMenuListener {
     main_frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
     //if( !DEBUG_ON ) main_frame.setUndecorated(true);
     GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
-    device.setFullScreenWindow(main_frame);
+    if( !DEBUG_ON ) device.setFullScreenWindow(main_frame);
     main_frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
     main_frame.setBackground( Color.BLACK );
     main_frame.setResizable( true );
@@ -155,6 +155,7 @@ public class DashboardGUI implements ActionListener, PopupMenuListener {
   private void handleSerialRouteEvent( ActionEvent evt ) {
     SerialRouteEvent serialEvt = (SerialRouteEvent) evt;
     String data = serialEvt.getReceivedMessage();
+    System.err.println(data);
     if( isSpeedData(data) ) {
       /* input is speed */
       setSpeed( data );
