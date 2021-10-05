@@ -14,7 +14,9 @@ public:
     }
     void run() {
         if(!enabled) return;
-        loop();
+        while(true) {
+          loop();
+        }
     }
 };
 

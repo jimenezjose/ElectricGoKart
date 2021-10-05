@@ -1,71 +1,77 @@
 /*******************************************************************************
-                                                    Jose Jorge Jimenez-Olivas
-
-File Name:       Dashboard.h
-Description:     This class calculates the go-kart's speed and evaluates the 
-                 driver's desired transmission state. It then sends this data 
-                 to the go-kart's dashboard, i.e. Dashboard GUI.
+ * Jose Jimenez-Olivas 
+ * Email: jjj023@ucsd.edu
+ * 
+ *                 University of California, San Diego
+ *                              Go-Karts
+ * 
+ * File Name:       Dashboard.h
+ * Description:     This class calculates the go-kart's speed and evaluates the 
+ *                  driver's desired transmission state. It then sends this data 
+ *                  to the go-kart's dashboard, i.e. Dashboard GUI.
 *******************************************************************************/
 #ifndef DASHBOARD_H
 #define DASHBOARD_H
 
-#define DASHBOARD_SERIAL Serial1
-
-#include "Filter.h"
-
+/*
+ * Dashboard proxy that sends data packet to Dashboard GUI. 
+ */
 class Dashboard {
 private:
     const int MAX_SPEED = 120;
-    const int throttle;
-    const int lockSwitch;
-
-    Filter filter;
-
-    void displaySpeed();
-    void displayTranmssion();
-    void displayLockState();
+    const HardwareSerial & DASHBOARD_SERIAL; 
+    int prevSpeedValue = 0;
 
 public:
-    Dashboard(const int throttle, const int lockSwitch) : filter(0.8), 
-        throttle(throttle), lockSwitch(lockSwitch) {}
+    /**
+     * Dashboard constructor
+     * @param serial serial line that connects to dashboard GUI app.
+     */
+    Dashboard(HardwareSerial & serial) : DASHBOARD_SERIAL(serial) {}
+    void displaySpeed(int);
+    void displayTranmssion(char);
+    void displayLockState(int);
 
+    /**
+     * Initializes dashboard dependencies such as BT serial line.
+     * @return Nothing.
+     */
     void init() {
-        DASHBOARD_SERIAL.begin(9600);
-        pinMode(throttle, INPUT);
-        pinMode(lockSwitch, INPUT);
+        Serial1.println("Initializing Dashboard...");
     }
 
-    void run() {
-        displaySpeed();
-        displayTranmssion();
-        displayLockState();
-    }
 };
 
-void Dashboard::displaySpeed() {
-    long knobValue = filter.read(analogRead(throttle));
-    long speedValue = map(knobValue, 0, 990, 0, MAX_SPEED);
+/**
+ * Sends speed value to be displayed on speedometer.
+ * @param speeedValue expected value from [0, 120].
+ * @return Nothing.
+ */
+void Dashboard::displaySpeed(int speedValue) {
+    if(prevSpeedValue == speedValue) return;
+    prevSpeedValue = speedValue;
     DASHBOARD_SERIAL.print("Speed: ");
     DASHBOARD_SERIAL.println(speedValue);
-    Serial.print("Speed: ");
-    Serial.println(speedValue);
+    
 }
 
-void Dashboard::displayTranmssion() {
-    // park
-    // Serial.println("P");
-    // Drive
-    // Serial.println("D"); 
-    // Reverse 
-    // Serial.println("R);
+/**
+ * Sends transmission state to be displayed on dashboard.
+ * @param transmissionState state of go kart transmission.
+ * @return Nothing
+ */
+void Dashboard::displayTranmssion(char transmissionState) {
+    DASHBOARD_SERIAL.println(transmissionState);
 }
 
-void Dashboard::displayLockState() {
-    int lockState = digitalRead(lockSwitch);
+/**
+ * Displays lock symbol on dashboard.
+ * @param lockState boolean value to display lock symbol on dashboard.
+ * @return Nothing.
+ */
+void Dashboard::displayLockState(int lockState) {
     DASHBOARD_SERIAL.print("Locked: ");
     DASHBOARD_SERIAL.println(lockState);
-    Serial.print("Locked: ");
-    Serial.println(lockState);
 }
 
 #endif
