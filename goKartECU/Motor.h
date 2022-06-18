@@ -10,35 +10,38 @@
 #ifndef MOTOR_H 
 #define MOTOR_H
 
-// 0..4095 dac SDA
-// 3200, 80% -> 3.66V, ~3.5V
-#define MIN_VOUT 0
-#define MAX_VOUT ((int)(0.8 * 4095))
-
-#include <Adafruit_MCP4725.h>
+#include <Adafruit_MCP4725.h> 
 #include "utils/Filter.h"
+
+#include <Wire.h>
 
 /*
  * Interface to the motor controller using a DAC from 0-3.6V for 0-100% throttle
  */
 class Motor {
 private:
-  int MIN_THROTTLE = 160;
-  int MAX_THROTTLE = 885;
-
+  const int MIN_THROTTLE;
+  const int MAX_THROTTLE;
   Adafruit_MCP4725 dac;
   Filter filter;
+  int throttle = 0;
+  int vout = 0;
 
 public:
+  // 0..4095 dac SDA
+  // 3200, 80% -> 3.66V, ~3.5V
+  const int MIN_VOUT = 0;
+  const int MAX_VOUT = ((int)(0.8 * 4095));
   
   /*
    * Motor Constructor
    * @note internal DAC uses I2C
    */
-  Motor() : filter(0.8) {}
+  Motor(int minThrottle, int maxThrottle) : filter(0.8), MIN_THROTTLE(minThrottle), MAX_THROTTLE(maxThrottle) {}
   void setThrottle(int);
-  void setMinThrottle(int);
-  void setMaxThrottle(int);
+  void setVout(int);
+  int getThrottle();
+  int getVout();
 
   /**
    * Sets up I2C prototocol from MCU to DAC with id 0x60.
@@ -56,30 +59,46 @@ public:
 /**
  * Reads throttle and excites the throttle motor accordingly.
  * @param throttleValue readings from a pedal potentiometer.
- * @return Nothing.
  */
 void Motor::setThrottle(int throttleValue) {
-    throttleValue = filter.read(throttleValue);
-    int vout = map(throttleValue, MIN_THROTTLE, MAX_THROTTLE, MIN_VOUT, MAX_VOUT);
-    dac.setVoltage(vout, false);
+  if(throttleValue < MIN_THROTTLE) { 
+    throttleValue = MIN_THROTTLE;
+  }
+  else if(throttleValue > MAX_THROTTLE) { 
+    throttleValue = MAX_THROTTLE;
+  }
+  throttle = filter.read(throttleValue);
+  vout = map(throttleValue, MIN_THROTTLE, MAX_THROTTLE, MIN_VOUT, MAX_VOUT);
+  dac.setVoltage(vout, false);
 }
 
 /**
- * Sets min potentiometer throttle readings.
- * @param value min throttle reading.
- * @return Nothing.
+ * Sets voltage for external DAC. For input range see MIN_VOUT, MAX_VOUT.
+ * @param voltage Volatage input for external DAC module.
  */
-void Motor::setMinThrottle(int value) {
-    MIN_THROTTLE = value;
+void Motor::setVout(int voltage) {
+  if(voltage < MIN_VOUT) {
+    voltage = MIN_VOUT;
+  }
+  else if(voltage > MAX_VOUT) {
+    voltage = MAX_VOUT;
+  }
+  vout = voltage;
+  dac.setVoltage(vout, false);
 }
 
 /**
- * Sets max potentiometer throttle readings.
- * @param value max throttle reading.
- * @return Nothing.
+ * Getter for internal throttle value.
  */
-void Motor::setMaxThrottle(int value) {
-    MAX_THROTTLE = value;
+int Motor::getThrottle() {
+  return throttle;
+}
+
+/**
+ * Getter for current voltage to external DAC.
+ */
+int Motor::getVout() {
+  return vout;
 }
 
 #endif
