@@ -9,12 +9,13 @@ $ ./runDashboardGUI.sh
 ## Dashboard Display
 
     The speed of the go kart is fed through a peripheral microcontroller via serial
-    comminication.
+    comminication. A Raspberry Pi 3 is hosting the Dashboard GUI and reading serial 
+    port messages from a microcontroller
 
 ![Alt Text](https://github.com/jimenezjose/Go_Kart/blob/assets/images/SpeedometerGUI%20screenshot.png)
 
 #### My Rasberry PI Configuration
-    For completness of documentation, this is how I run the dashboard GUI on startup.
+    For completness of documentation, this is how I run the Raspberrt Pi dashboard GUI on startup.
 
     Source of [Help](https://learn.sparkfun.com/tutorials/how-to-run-a-raspberry-pi-program-on-startup/all)
 
