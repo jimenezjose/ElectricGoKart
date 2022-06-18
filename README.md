@@ -1,4 +1,4 @@
-# Go_Kart
+# ElectricGoKart
 How to make an Arduino go-kart [In Progress] 
 
 ## How to Run Speedometer GUI: 
