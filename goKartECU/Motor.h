@@ -15,6 +15,12 @@
 
 #include <Wire.h>
 
+enum class Transmission {
+  PARK = 0,
+  REVERSE = 1,
+  DRIVE = 2,
+};
+
 /*
  * Interface to the motor controller using a DAC from 0-3.6V for 0-100% throttle
  */
@@ -26,6 +32,9 @@ private:
   Filter filter;
   int throttle = 0;
   int vout = 0;
+  Transmission transmission = Transmission::DRIVE;
+  int driveSwitch = 4;
+  int reverseSwitch = 5;
 
 public:
   // 0..4095 dac SDA
@@ -39,8 +48,10 @@ public:
    */
   Motor(int minThrottle, int maxThrottle) : filter(0.8), MIN_THROTTLE(minThrottle), MAX_THROTTLE(maxThrottle) {}
   void setThrottle(int);
+  void setTransmission(Transmission);
   void setVout(int);
   int getThrottle();
+  Transmission getTransmission();
   int getVout();
 
   /**
@@ -51,6 +62,8 @@ public:
     // For MCP4725A0 the address is 0x60 or 0x61
     // For MCP4725A2 the address is 0x64 or 0x65
     Serial1.println("Initializing Motor...");
+    pinMode(driveSwitch, OUTPUT);
+    pinMode(reverseSwitch, OUTPUT);
     dac.begin(0x60);
   }
 
@@ -87,6 +100,27 @@ void Motor::setVout(int voltage) {
   dac.setVoltage(vout, false);
 }
 
+/** 
+ * Sets the transmission state of the motor. 
+ */
+void Motor::setTransmission(Transmission transmissionState) {
+  transmission = transmissionState;
+  switch(transmission) {
+    case Transmission::PARK:
+      digitalWrite(driveSwitch, LOW);
+      digitalWrite(reverseSwitch, LOW);
+      break;
+    case Transmission::REVERSE:
+      digitalWrite(driveSwitch, LOW);
+      digitalWrite(reverseSwitch, HIGH);
+      break;
+    case Transmission::DRIVE:
+      digitalWrite(driveSwitch, HIGH);
+      digitalWrite(reverseSwitch, LOW);
+      break;
+  }
+}
+
 /**
  * Getter for internal throttle value.
  */
@@ -99,6 +133,13 @@ int Motor::getThrottle() {
  */
 int Motor::getVout() {
   return vout;
+}
+
+/** 
+ * Getter for current transmission state. 
+ */
+Transmission Motor::getTransmission() {
+  return transmission;
 }
 
 #endif

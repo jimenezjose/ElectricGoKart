@@ -18,10 +18,11 @@
 #define MAX_THROTTLE 885
 
 const int pedal = A0;
-const int lockSwitch = 6;
+const int tranmissionSwitch = 6;
 int throttle = 0;
 int speed_mph = 0;
 int voltageToMotor = 0;
+Transmission transmission = Transmission::DRIVE;
 
 BaseStation baseStation(Serial1, throttle, speed_mph, voltageToMotor);
 Dashboard dashboard(Serial1); 
@@ -44,13 +45,17 @@ void setup() {
 }
 
 void loop() {
-  /* inputs */
   baseStation.task();
+  // TODO (github/jimenezjose): GPS task to collect enttire suite of attributes from a single GNSS message.
+
+  /* inputs */
   throttle = analogRead(pedal);
   speed_mph = gps.get_speed_mph();
+  //transmission = digitalRead(tranmissionSwitch) ? Transmission::REVERSE : Transmission::DRIVE;
 
   /* outputs */
   if(baseStation.getMode() == BaseStationMode::MANUAL) {
+    motor.setTransmission(transmission);
     motor.setThrottle(throttle);
     dashboard.displaySpeed(speed_mph);
   }
@@ -68,7 +73,5 @@ void loop() {
  */
 void emergencyBrake() {
   throttle = 0;
-  speed_mph = 0;
   motor.setThrottle(throttle); 
-  dashboard.displaySpeed(speed_mph); 
 }
