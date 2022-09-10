@@ -41,6 +41,7 @@ public:
   // 3200, 80% -> 3.66V, ~3.5V
   const int MIN_VOUT = 0;
   const int MAX_VOUT = ((int)(0.8 * 4095));
+  const int TRANSISTOR_DELAY = 1; // Datasheet states a 10ns delay for P2N2222A transistor.
   
   /*
    * Motor Constructor
@@ -112,11 +113,13 @@ void Motor::setTransmission(Transmission transmissionState) {
       break;
     case Transmission::REVERSE:
       digitalWrite(driveSwitch, LOW);
+      delay(TRANSISTOR_DELAY);
       digitalWrite(reverseSwitch, HIGH);
       break;
     case Transmission::DRIVE:
-      digitalWrite(driveSwitch, HIGH);
       digitalWrite(reverseSwitch, LOW);
+      delay(TRANSISTOR_DELAY);
+      digitalWrite(driveSwitch, HIGH);
       break;
   }
 }

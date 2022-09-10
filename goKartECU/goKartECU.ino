@@ -19,12 +19,14 @@
 
 const int pedal = A0;
 const int tranmissionSwitch = 6;
+const int keySwitch = A1;
 int throttle = 0;
 int speed_mph = 0;
 int voltageToMotor = 0;
+int isLocked = false;
 Transmission transmission = Transmission::DRIVE;
 
-BaseStation baseStation(Serial1, throttle, speed_mph, voltageToMotor);
+BaseStation baseStation(Serial1, throttle, speed_mph, voltageToMotor, isLocked, transmission);
 Dashboard dashboard(Serial1); 
 Motor motor(MIN_THROTTLE, MAX_THROTTLE);
 GPS gps(8, 7); /* RX, TX */
@@ -35,6 +37,9 @@ void setup() {
   Serial1.println("Go-Kart Software");
   Serial1.println("By: Jose Jimenez-Olivas\n");
 
+  pinMode(pedal, INPUT);
+  pinMode(tranmissionSwitch, INPUT_PULLUP);
+  pinMode(keySwitch, INPUT_PULLUP);
   motor.init();
   gps.init();
   dashboard.init();
@@ -46,32 +51,37 @@ void setup() {
 
 void loop() {
   baseStation.task();
-  // TODO (github/jimenezjose): GPS task to collect enttire suite of attributes from a single GNSS message.
+  // TODO (github/jimenezjose): GPS task to collect entire suite of attributes from a single GNSS message.
 
   /* inputs */
+  isLocked = !digitalRead(keySwitch) || baseStation.isLocked();
   throttle = analogRead(pedal);
   speed_mph = gps.get_speed_mph();
-  //transmission = digitalRead(tranmissionSwitch) ? Transmission::REVERSE : Transmission::DRIVE;
+  transmission = digitalRead(tranmissionSwitch) ? Transmission::DRIVE : Transmission::REVERSE;
 
   /* outputs */
-  if(baseStation.getMode() == BaseStationMode::MANUAL) {
+  if(isLocked) {
+    emergencyBrake();
+  }
+  else if(baseStation.getMode() == BaseStationMode::MANUAL) {
     motor.setTransmission(transmission);
     motor.setThrottle(throttle);
-    dashboard.displaySpeed(speed_mph);
   }
   else if(baseStation.getMode() == BaseStationMode::OVERRIDE) {
     motor.setThrottle(0);
-    dashboard.displaySpeed(speed_mph);
   }
-
-  /* sensor outputs */
+  
   voltageToMotor = motor.getVout();
+  
+  /* Display dashboard graphics. */
+  dashboard.displaySpeed(speed_mph);
+  dashboard.displayLockState(isLocked);
+  dashboard.displayTransmission(transmission);
 }
 
 /**
  * Forcibly set actuators to their rest state.
  */
 void emergencyBrake() {
-  throttle = 0;
-  motor.setThrottle(throttle); 
+  motor.setThrottle(0);
 }

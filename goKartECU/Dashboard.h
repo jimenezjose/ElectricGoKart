@@ -13,6 +13,8 @@
 #ifndef DASHBOARD_H
 #define DASHBOARD_H
 
+#include "motor.h"
+
 /*
  * Dashboard proxy that sends data packet to Dashboard GUI. 
  */
@@ -20,6 +22,8 @@ class Dashboard {
 private:
     HardwareSerial & DASHBOARD_SERIAL; 
     int prevSpeedValue = 0;
+    int prevLockState = 0;
+    Transmission prevTransmissionState = Transmission::PARK;
 
 public:
     const int MAX_SPEED = 120;
@@ -31,7 +35,7 @@ public:
      */
     Dashboard(HardwareSerial & serial) : DASHBOARD_SERIAL(serial) {}
     void displaySpeed(int);
-    void displayTranmssion(char);
+    void displayTransmission(Transmission);
     void displayLockState(int);
 
     /**
@@ -59,8 +63,21 @@ void Dashboard::displaySpeed(int speedValue) {
  * Sends transmission state to be displayed on dashboard.
  * @param transmissionState state of go kart transmission.
  */
-void Dashboard::displayTranmssion(char transmissionState) {
-    DASHBOARD_SERIAL.println(transmissionState);
+void Dashboard::displayTransmission(Transmission transmissionState) {
+    if(prevTransmissionState == transmissionState) return;
+    prevTransmissionState = transmissionState;
+    DASHBOARD_SERIAL.print("Transmission: ");
+    switch(transmissionState) {
+      case Transmission::PARK:
+        DASHBOARD_SERIAL.println("P");
+        break;
+      case Transmission::REVERSE:
+        DASHBOARD_SERIAL.println("R");
+        break;
+      case Transmission::DRIVE:
+        DASHBOARD_SERIAL.println("D");
+        break;
+    }
 }
 
 /**
@@ -68,6 +85,8 @@ void Dashboard::displayTranmssion(char transmissionState) {
  * @param lockState boolean value to display lock symbol on dashboard.
  */
 void Dashboard::displayLockState(int lockState) {
+    if(prevLockState == lockState) return;
+    prevLockState = lockState;
     DASHBOARD_SERIAL.print("Locked: ");
     DASHBOARD_SERIAL.println(lockState);
 }
