@@ -11,6 +11,7 @@ $ ./runSpeedometerGUI.sh
 
 ## Go Kart Gallery
 ![Alt Text](https://github.com/jimenezjose/ElectricGoKart/blob/assets/images/Full_Go_Kart_Shot.png)
+![Alt Text](https://github.com/jimenezjose/ElectricGoKart/blob/assets/images/San%20Diego%20In%20Progress%20Full%20Go%20Kart%20Shot.jpg)
 ![Alt Text](https://github.com/jimenezjose/Go_Kart/blob/assets/images/current_go_kart.JPG)
 ![Alt Text](https://github.com/jimenezjose/Go_Kart/blob/assets/images/Rear_sprocket.jpeg)
 
