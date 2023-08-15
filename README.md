@@ -9,8 +9,8 @@ How to make an Arduino go-kart [In Progress]
 
 ## Video Demos:
 
-[Go Kart Profile - From Trash to Glory](https://youtube.com/shorts/eytkYaNm3K0?feature=share)
-[Go Kart Demo - School Track & Field Circuit](https://youtube.com/shorts/nsclC6EIYOg)
+* [Go Kart Profile - From Trash to Glory](https://youtube.com/shorts/eytkYaNm3K0?feature=share)
+* [Go Kart Demo - School Track & Field Circuit](https://youtube.com/shorts/nsclC6EIYOg)
 
 ## Speedometer Display
 ![Alt Text](https://github.com/jimenezjose/Go_Kart/blob/assets/images/SpeedometerGUI%20screenshot.png)
