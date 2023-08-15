@@ -10,6 +10,7 @@ $ ./runSpeedometerGUI.sh
 ```
 
 ## Current Go Kart
+![Alt Text](https://github.com/jimenezjose/ElectricGoKart/blob/assets/images/Full_Go_Kart_Shot.png)
 ![Alt Text](https://github.com/jimenezjose/Go_Kart/blob/assets/images/current_go_kart.JPG)
 ![Alt Text](https://github.com/jimenezjose/Go_Kart/blob/assets/images/Rear_sprocket.jpeg)
 
