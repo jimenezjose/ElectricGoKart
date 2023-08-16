@@ -4,7 +4,7 @@ How to make an Arduino go-kart [In Progress]
 ## Video Demos:
 
 * [Go Kart Profile - From Trash to Glory](https://youtube.com/shorts/eytkYaNm3K0?feature=share)
-* [Go Kart Demo - School Track & Field Circuit](https://youtube.com/shorts/nsclC6EIYOg)
+* [Go Kart Demo - School Hallway Circuit](https://youtube.com/shorts/wB-m4J15FnU?feature=share)
 
 ## Go Kart Gallery
 ![Alt Text](https://github.com/jimenezjose/ElectricGoKart/blob/assets/images/Full_Go_Kart_Shot.png)
