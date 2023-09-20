@@ -1,5 +1,5 @@
 # ElectricGoKart
-How to make an Arduino go-kart [In Progress] 
+How to make an Arduino Go Kart
 
 ## Video Demos:
 
